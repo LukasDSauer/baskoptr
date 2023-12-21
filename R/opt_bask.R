@@ -22,12 +22,12 @@ setMethod("opt_design", "OneStageBasket",
             } else {
               lgrid <- nrow(grid)
             }
-            
+
             l1 <- length(weight_params)
             l2 <- length(globalweight_params)
             lambdas <- numeric(lgrid)
             p <- progressr::progressor(steps = lgrid)
-            
+
             ecd_res <- foreach(i = 1:lgrid, .combine = 'rbind') %dofuture% {
               res_loop <- numeric(ncol(scenarios) + 1)
               if (l1 >= 1) {
@@ -40,13 +40,13 @@ setMethod("opt_design", "OneStageBasket",
               } else {
                 ploop2 <- list()
               }
-              
+
               l <- do.call(adjust_lambda, args = c(design = list(design), n = n,
                                                    p1 = NULL, alpha = alpha, weight_fun = weight_fun,
                                                    weight_params = list(ploop1), globalweight_fun = globalweight_fun,
                                                    globalweight_params = list(ploop2), prec_digits = prec_digits, ...))
               res_loop[1] <- l$lambda
-              
+
               for (j in 1:ncol(scenarios)) {
                 res_loop[j + 1] <- do.call(ecd, args = c(design = list(design),
                                                          p1 = list(scenarios[, j]), n = n, lambda = l$lambda,
@@ -69,32 +69,6 @@ setMethod("opt_design", "OneStageBasket",
             }
           })
 
-#' Create a Scenario Matrix
-#'
-#' Creates a default scenario matrix.
-#'
-#' @template design
-#' @param p1 Probabilitiy under the alternative hypothesis.
-#'
-#' @details \code{get_scenarios} creates a default scenario matrix
-#' that can be used for \code{\link{opt_design}}. The function creates
-#' \code{k + 1} scenarios, from a global null to a global alternative scenario.
-#'
-#' @return A matrix with \code{k} rows and \code{k + 1} columns.
-#' @export
-#'
-#' @examples
-#' design <- setupOneStageBasket(k = 3, p0 = 0.2)
-#' get_scenarios(design = design, p1 = 0.5)
-get_scenarios <- function(design, p1) {
-  scen_mat <- matrix(nrow = design@k, ncol = design@k + 1)
-  for (i in 0:design@k) {
-    scen_mat[, (i + 1)] <- c(rep(design@p0, design@k - i),
-                             rep(p1, i))
-  }
-  colnames(scen_mat) <- paste(0:design@k, "Active")
-  scen_mat
-}
 
 
 #' Optimize a Basket Trial Design
@@ -140,19 +114,19 @@ opt_design <- function(design, n, alpha, design_params = list(), scenarios,
     lgrid <- nrow(grid)
   }
   p <- progressr::progressor(steps = lgrid)
-  
+
   ecd_res <- matrix(nrow = lgrid, ncol = ncol(scenarios))
   colnames(ecd_res) <- colnames(scenarios)
   lambdas <- numeric(lgrid)
   null_scen <- which(apply(scenarios, 2, function(x) all(x == design$p0)))
-  
+
   for (i in 1:lgrid) {
     params_loop <- lapply(as.list(grid), function(x) x[i])
     l <- do.call(adjust_lambda, args = list(design = design, n = n,
                                             p1 = NULL, alpha = alpha, design_params = params_loop, iter = iter,
                                             prec_digits = prec_digits, data = data[[null_scen]], ...))
     lambdas[i] <- l$lambda
-    
+
     for (j in 1:ncol(scenarios)) {
       ecd_res[i, j] <- do.call(ecd, args = c(design = list(design), n = n,
                                              p1 = list(scenarios[, j]), lambda = l$lambda, params_loop,
@@ -160,7 +134,7 @@ opt_design <- function(design, n, alpha, design_params = list(), scenarios,
     }
     p()
   }
-  
+
   if (ncol(grid) == 0) {
     ecd_res <- cbind("Lambda" = lambdas, ecd_res,
                      "Mean_ECD" = rowMeans(ecd_res))
@@ -172,29 +146,83 @@ opt_design <- function(design, n, alpha, design_params = list(), scenarios,
   ecd_res
 }
 
-#' Create a Scenario Matrix
+#' Optimize a Basket Trial Design
 #'
-#' Creates a default scenario matrix.
+#' Optimize the parameters of a basket trial design using a utility-based
+#' approach with a simulation algorithm of your choice.
 #'
 #' @template design
-#' @param p1 Probability under the alternative hypothesis.
+#' @template utility
+#' @template algorithm
+#' @template detail_params
+#' @template utility_params
+#' @template algorithm_params
+#' @template trace
 #'
-#' @details \code{get_scenarios} creates a default scenario matrix
-#' that can be used for \code{\link{opt_design}}. The function creates
-#' \code{k + 1} scenarios, from a global null to a global alternative scenario.
+#' @inherit optimization_optim_sa return
 #'
-#' @return A matrix with \code{k} rows and \code{k + 1} columns.
 #' @export
 #'
 #' @examples
-#' design <- setup_fujikawa(k = 3, p0 = 0.2)
-#' get_scenarios(design = design, p1 = 0.5)
-get_scenarios <- function(design, p1) {
-  scen_mat <- matrix(nrow = design$k, ncol = design$k + 1)
-  for (i in 0:design$k) {
-    scen_mat[, (i + 1)] <- c(rep(design$p0, design$k - i),
-                             rep(p1, i))
+#' design <- setupOneStageBasket(k, shape1 = 1, shape2 = 1, p0 = 0.2)
+#' opt_design_gen(design = design,
+#'                utility = u_ewp_discont,
+#'                algorithm = optimizr::simann,
+#'                detail_params = list(p1 = c(0.5, 0.2, 0.2),
+#'                                    n = 20,
+#'                                    weight_fun = weights_fujikawa,
+#'                                    logbase = exp(1)),
+#'                utility_params = list(thresh = 0.05),
+#'                algorithm_params = list(par = c(lambda = 0.99,
+#'                                                     epsilon = 2,
+#'                                                     tau = 0.5),
+#'                                        lower = c(lambda = 0.001,
+#'                                                     epsilon = 1,
+#'                                                     tau = 0.001),
+#'                                        upper = c(lambda = 0.999,
+#'                                                  epsilon = 10,
+#'                                                  tau = 0.999),
+#'                                        control = list(maxit = 10000,
+#'                                                       temp = 2000)))
+#' opt_design_gen(design = design,
+#'                utility = u_powfwer_discont_bound,
+#'                algorithm = stats_optim_sann,
+#'                detail_params = list(n = 20, p1 = c(0.5, 0.2, 0.2),
+#'                                     logbase = exp(1), exact = TRUE),
+#'                utility_params = list(alpha = 0.05,
+#'                                      lower = c(lambda = 0.001,
+#'                                                epsilon = 1,
+#'                                                tau = 0.001),
+#'                                       upper = c(lambda = 0.999,
+#'                                                 epsilon = 10,
+#'                                                 tau = 0.999)),
+#'                algorithm_params = list(start = c(lambda = 0.99,
+#'                                                     epsilon = 2,
+#'                                                     tau = 0.5),
+#'                                        maximization = TRUE,
+#'                                        control = list(maxit = 30000,
+#'                                                       temp = 2000,
+#'                                                       REPORT = 2)))
+opt_design_gen <- function(design, utility, algorithm, detail_params,
+                           utility_params, algorithm_params, trace = TRUE){
+  x_names <- character()
+  if(!is.null(algorithm_params$lower)){
+    x_names <- names(algorithm_params$lower)
+  } else if(!is.null(algorithm_params$par)){
+    x_names <- names(algorithm_params$par)
+  } else {
+    stop("Cannot retrieve parameter vector names from algorithm_params. Please
+         supply a 'lower' or a 'par'  argument in algorithm_params.")
   }
-  colnames(scen_mat) <- paste(0:design$k, "Active")
-  scen_mat
+  u_fun <- function(x){
+    x_named <- x
+    names(x_named) <- x_names
+    do.call(utility, c(design = list(design),
+                       x = list(x_named),
+                       detail_params = list(detail_params),
+                       utility_params))}
+  res <- do.call(algorithm,
+                 c(fun = u_fun,
+                   trace = trace,
+                   algorithm_params))
 }
