@@ -17,23 +17,25 @@
 #'   is `"jensen_shannon"`, meaning that the similarity of baskets is based on
 #'   the Jensen-Shannon divergence.
 #'
-#' @include divergences.R
+#' @examples
+#' fujikawa(k = 3, n = 15,
+#'          weights_fun = "jensen_shannon",
+#'          prior_params = list(shape1 = 1, shape2 = 1),
+#'          tuning_params = list(lambda = 0.99, epsilon = 2, tau = 0.5))
 #' @export
 fujikawa <- setClass("fujikawa",
-                     slots = list(weights_fun = "numeric"),
+                     slots = list(weights_fun = "character"),
                      contains = "basket_bayesian")
 #' Decide which basket is active
 #'
-#' @param design a basket trial design
-#' @param x numeric vector of length `design@k` containing the number of
-#' responses in each basket
+#' @inheritParams decide
 #'
 #' @export
 setMethod(
   "decide",
-  signature(x = "fujikawa"),
+  signature(design = "fujikawa", x = "numeric"),
   definition = function(design, x) {
-    return(borrow_postp(x) >= design@lambda)
+    return(pbpost(x) >= design@tuning_params$lambda)
   }
 )
 #' Weights for borrowing in Fujikawa's design
@@ -44,11 +46,11 @@ setMethod(
 #' measures can be used.
 #'
 #' @return a matrix of dimension (`k`,`k`).
-#'
+#' @include divergences.R
 #' @export
 setMethod(
   "bweights",
-  signature(x = "fujikawa"),
+  signature(design = "fujikawa", x = "numeric"),
   definition = function(design, x) {
     if(design@weights_fun == "jensen_shannon"){
       basket_grid <- expand.grid((1:design@k), (1:design@k))
@@ -77,7 +79,7 @@ setMethod(
 #' @export
 setMethod(
   "post_params",
-  signature(x = "fujikawa"),
+  signature(design = "fujikawa", x = "numeric"),
   definition = function(design, x) {
     return(list(shape1 = design@prior_params$shape1 + x,
                 shape2 = design@prior_params$shape2 + design@n - x))
@@ -88,7 +90,7 @@ setMethod(
 #' @export
 setMethod(
   "ppost",
-  signature(x = "fujikawa"),
+  signature(design = "fujikawa", x = "numeric"),
   definition = function(design, x) {
 
   }
@@ -98,16 +100,17 @@ setMethod(
 #' @export
 setMethod(
   "pbpost",
-  signature(x = "fujikawa"),
+  signature(design = "fujikawa", x = "numeric"),
   definition = function(design, x) {
     p_prms <- post_params(design, x)
     bws <- bweights(design, x)
+    browser()
     mapply(function(rate, shape1, shape2) {
-              pbeta(q = rate,
+              return(pbeta(q = rate,
                     shape1 = shape1,
                     shape2 = shape2,
                     lower.tail = FALSE
-                    )
+                    ))
            },
            x / design@n,
            bws*pprms$shape1,

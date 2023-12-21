@@ -15,5 +15,5 @@
 #' @seealso basket fujikawa
 #' @export
 basket_bayesian <- setClass("basket_bayesian",
-         slots=list(prior_params = "numeric"),
+         slots=list(prior_params = "list"),
          contains = "basket")

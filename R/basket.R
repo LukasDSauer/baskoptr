@@ -15,8 +15,11 @@
 basket <- setClass("basket",
          slots=list(k = "numeric",
                     n = "numeric",
-                    tuning_params = "numeric"))
+                    tuning_params = "list"))
 setMethod("decide",
-          signature(x = "basket"))
+          signature(design = "basket", x = "numeric"),
+          definition = function(design, x){
+            return(NULL)
+          })
 
 
