@@ -9,9 +9,9 @@
 #' further parameters to be supplied to the utility.
 #'
 #' @param algorithm A function returning the optimization algorithm's results,
-#' should have the form `algorithm(fun, trace, ...)`, where `fun` is the
-#' function to be optimized, `trace` is a logical for requesting algorithm
-#' trace, and `...` may be further parameters of the optimization algorithm.
+#' should have the form `algorithm(fn, ...)`, where `fn` is the
+#' function to be optimized and `...` may be further parameters of the
+#' optimization algorithm.
 #' @param utility_params A named list of further parameters that need to be
 #' supplied to  the utility function.
 #' @param algorithm_params A named list of further parameters that need to be
@@ -19,8 +19,8 @@
 #' @param trace A logical, should the trace of the optimization algorithm be
 #' returned?
 #'
-#' @return a list consisting of the optimization result vector, the optimal
-#'  utility value, and the trace of the optimization algorithm
+#' @return a list consisting of the optimal parameter vector, the resulting
+#' optimal utility value, and the trace of the optimization algorithm.
 #'
 #' @export
 #'
