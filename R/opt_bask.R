@@ -18,6 +18,9 @@
 #' supplied to the optimization algorithm.
 #' @param trace A logical, should the trace of the optimization algorithm be
 #' returned?
+#' @param x_names character vector containing the names of the utility functions
+#' tuning parameters, automatically retrieved from `algorithm_params$par` or
+#' `algorithm_params$lower` if either is present. Default is `NULL`.
 #'
 #' @return a list consisting of the optimal parameter vector, the resulting
 #' optimal utility value, and the trace of the optimization algorithm.
@@ -30,51 +33,72 @@
 #'                utility = u_ewp_discont,
 #'                algorithm = optimizr::simann,
 #'                detail_params = list(p1 = c(0.5, 0.2, 0.2),
-#'                                    n = 20,
-#'                                    weight_fun = weights_fujikawa,
-#'                                    logbase = exp(1)),
+#'                                     n = 20,
+#'                                     weight_fun = weights_fujikawa,
+#'                                     logbase = exp(1)),
 #'                utility_params = list(thresh = 0.05),
 #'                algorithm_params = list(par = c(lambda = 0.99,
-#'                                                     epsilon = 2,
-#'                                                     tau = 0.5),
+#'                                                epsilon = 2,
+#'                                                tau = 0.5),
 #'                                        lower = c(lambda = 0.001,
-#'                                                     epsilon = 1,
-#'                                                     tau = 0.001),
+#'                                                  epsilon = 1,
+#'                                                  tau = 0.001),
 #'                                        upper = c(lambda = 0.999,
 #'                                                  epsilon = 10,
 #'                                                  tau = 0.999),
-#'                                        control = list(maxit = 10000,
-#'                                                       temp = 2000,
+#'                                        control = list(maxit = 1000,
+#'                                                       temp = 10,
 #'                                                       fnscale = -1)))
 #' opt_design_gen(design = design,
-#'                utility = u_powfwer_discont_bound,
-#'                algorithm = stats_optim_sann,
-#'                detail_params = list(n = 20, p1 = c(0.5, 0.2, 0.2),
-#'                                     logbase = exp(1), exact = TRUE),
-#'                utility_params = list(alpha = 0.05,
+#'                utility = u_ewp_discont_bound,
+#'                algorithm = optim,
+#'                detail_params = list(p1 = c(0.5, 0.2, 0.2),
+#'                                     n = 20,
+#'                                     weight_fun = weights_fujikawa,
+#'                                     logbase = exp(1)),
+#'                utility_params = list(thresh = 0.05,
 #'                                      lower = c(lambda = 0.001,
 #'                                                epsilon = 1,
 #'                                                tau = 0.001),
-#'                                       upper = c(lambda = 0.999,
-#'                                                 epsilon = 10,
-#'                                                 tau = 0.999)),
-#'                algorithm_params = list(start = c(lambda = 0.99,
-#'                                                     epsilon = 2,
-#'                                                     tau = 0.5),
-#'                                        maximization = TRUE,
-#'                                        control = list(maxit = 30000,
-#'                                                       temp = 2000,
-#'                                                       REPORT = 2)))
+#'                                        upper = c(lambda = 0.999,
+#'                                                  epsilon = 10,
+#'                                                  tau = 0.999)),
+#'                algorithm_params = list(par = c(lambda = 0.99,
+#'                                                epsilon = 2,
+#'                                                tau = 0.5),
+#'                                        control = list(maxit = 1000,
+#'                                                       temp = 10,
+#'                                                       fnscale = -1)))
+#' axes = list(lambda = c(0.01, seq(0.1, 0.9, 0.1)),
+#'                                     epsilon = c(seq(0.5, 3, 0.5),
+#'                                                 c(5, 7.5, 10, 12.5)),
+#'                                     tau = c(0.01, seq(0.1, 0.9, 0.1))))
+#' opt_design_gen(design = design,
+#'                utility = u_ewp_discont,
+#'                algorithm = optimizr::gridsearch,
+#'                detail_params = list(p1 = c(0.5, 0.2, 0.2),
+#'                                     n = 20,
+#'                                     weight_fun = weights_fujikawa,
+#'                                     logbase = exp(1)),
+#'                utility_params = list(thresh = 0.05),
+#'                algorithm_params = list(axes = list(lambda = c(0.01, seq(0.1, 0.9, 0.1)),
+#'                                     epsilon = c(seq(0.5, 3, 0.5),
+#'                                                 c(5, 7.5, 10, 12.5)),
+#'                                     tau = c(0.01, seq(0.1, 0.9, 0.1)))),
+#'                x_names = c("lambda", "epsilon", "tau"))
 opt_design_gen <- function(design, utility, algorithm, detail_params,
-                           utility_params, algorithm_params, trace = TRUE){
-  x_names <- character()
-  if(!is.null(algorithm_params$lower)){
-    x_names <- names(algorithm_params$lower)
-  } else if(!is.null(algorithm_params$par)){
-    x_names <- names(algorithm_params$par)
-  } else {
-    stop("Cannot retrieve parameter vector names from algorithm_params. Please
-         supply a 'lower' or a 'par'  argument in algorithm_params.")
+                           utility_params, algorithm_params, trace = TRUE,
+                           x_names = NULL){
+  if(is.null(x_names)){
+    if(!is.null(algorithm_params$lower)){
+      x_names <- names(algorithm_params$lower)
+    } else if(!is.null(algorithm_params$par)){
+      x_names <- names(algorithm_params$par)
+    } else {
+      stop("Cannot retrieve parameter vector names from algorithm_params and
+          x_names is NULL. Please supply an x_names argument or
+          algorithm_params$par or algorithm_params$lower.")
+    }
   }
   u_fun <- function(x){
     x_named <- x
@@ -87,3 +111,4 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
                  c(fn = u_fun,
                    algorithm_params))
 }
+

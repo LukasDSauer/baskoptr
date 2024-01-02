@@ -50,12 +50,13 @@ u_ewp_discont_bound <-
   function(design,
            x,
            detail_params,
-           alpha,
+           thresh,
            lower,
            upper) {
-    if (!all(lower < x) | !(all(x < upper))) {
+    if (!all(lower <= x) | !(all(x <= upper))) {
       return(NA_real_)
     } else{
-      return(u_ewp_discont(design, x, detail_params, alpha))
+      return(u_ewp_discont(design, x, detail_params, thresh))
     }
   }
+

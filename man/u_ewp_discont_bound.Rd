@@ -5,7 +5,7 @@
 \title{Utility function: Discontinuous power function with type-I error penalty and
 boundaries on the parameters}
 \usage{
-u_ewp_discont_bound(design, x, detail_params, alpha, lower, upper)
+u_ewp_discont_bound(design, x, detail_params, thresh, lower, upper)
 }
 \arguments{
 \item{design}{An object of class \code{Basket} created by the function

@@ -11,7 +11,8 @@ opt_design_gen(
   detail_params,
   utility_params,
   algorithm_params,
-  trace = TRUE
+  trace = TRUE,
+  x_names = NULL
 )
 }
 \arguments{
@@ -23,9 +24,9 @@ opt_design_gen(
 further parameters to be supplied to the utility.}
 
 \item{algorithm}{A function returning the optimization algorithm's results,
-should have the form \code{algorithm(fun, trace, ...)}, where \code{fun} is the
-function to be optimized, \code{trace} is a logical for requesting algorithm
-trace, and \code{...} may be further parameters of the optimization algorithm.}
+should have the form \code{algorithm(fn, ...)}, where \code{fn} is the
+function to be optimized and \code{...} may be further parameters of the
+optimization algorithm.}
 
 \item{detail_params}{A named list of parameters that need to be supplied to
 \code{baskexact::toer()} and \code{baskexact::pow()}.}
@@ -38,10 +39,14 @@ supplied to the optimization algorithm.}
 
 \item{trace}{A logical, should the trace of the optimization algorithm be
 returned?}
+
+\item{x_names}{character vector containing the names of the utility functions
+tuning parameters, automatically retrieved from \code{algorithm_params$par} or
+\code{algorithm_params$lower} if either is present. Default is \code{NULL}.}
 }
 \value{
-a list consisting of the optimization result vector, the optimal
-utility value, and the trace of the optimization algorithm
+a list consisting of the optimal parameter vector, the resulting
+optimal utility value, and the trace of the optimization algorithm.
 }
 \description{
 Optimize the parameters of a basket trial design using a utility-based
@@ -53,39 +58,57 @@ opt_design_gen(design = design,
                utility = u_ewp_discont,
                algorithm = optimizr::simann,
                detail_params = list(p1 = c(0.5, 0.2, 0.2),
-                                   n = 20,
-                                   weight_fun = weights_fujikawa,
-                                   logbase = exp(1)),
+                                    n = 20,
+                                    weight_fun = weights_fujikawa,
+                                    logbase = exp(1)),
                utility_params = list(thresh = 0.05),
                algorithm_params = list(par = c(lambda = 0.99,
-                                                    epsilon = 2,
-                                                    tau = 0.5),
+                                               epsilon = 2,
+                                               tau = 0.5),
                                        lower = c(lambda = 0.001,
-                                                    epsilon = 1,
-                                                    tau = 0.001),
+                                                 epsilon = 1,
+                                                 tau = 0.001),
                                        upper = c(lambda = 0.999,
                                                  epsilon = 10,
                                                  tau = 0.999),
-                                       control = list(maxit = 10000,
-                                                      temp = 2000,
+                                       control = list(maxit = 1000,
+                                                      temp = 10,
                                                       fnscale = -1)))
 opt_design_gen(design = design,
-               utility = u_powfwer_discont_bound,
-               algorithm = stats_optim_sann,
-               detail_params = list(n = 20, p1 = c(0.5, 0.2, 0.2),
-                                    logbase = exp(1), exact = TRUE),
-               utility_params = list(alpha = 0.05,
+               utility = u_ewp_discont_bound,
+               algorithm = optim,
+               detail_params = list(p1 = c(0.5, 0.2, 0.2),
+                                    n = 20,
+                                    weight_fun = weights_fujikawa,
+                                    logbase = exp(1)),
+               utility_params = list(thresh = 0.05,
                                      lower = c(lambda = 0.001,
                                                epsilon = 1,
                                                tau = 0.001),
-                                      upper = c(lambda = 0.999,
-                                                epsilon = 10,
-                                                tau = 0.999)),
-               algorithm_params = list(start = c(lambda = 0.99,
-                                                    epsilon = 2,
-                                                    tau = 0.5),
-                                       maximization = TRUE,
-                                       control = list(maxit = 30000,
-                                                      temp = 2000,
-                                                      REPORT = 2)))
+                                       upper = c(lambda = 0.999,
+                                                 epsilon = 10,
+                                                 tau = 0.999)),
+               algorithm_params = list(par = c(lambda = 0.99,
+                                               epsilon = 2,
+                                               tau = 0.5),
+                                       control = list(maxit = 1000,
+                                                      temp = 10,
+                                                      fnscale = -1)))
+axes = list(lambda = c(0.01, seq(0.1, 0.9, 0.1)),
+                                    epsilon = c(seq(0.5, 3, 0.5),
+                                                c(5, 7.5, 10, 12.5)),
+                                    tau = c(0.01, seq(0.1, 0.9, 0.1))))
+opt_design_gen(design = design,
+               utility = u_ewp_discont,
+               algorithm = optimizr::gridsearch,
+               detail_params = list(p1 = c(0.5, 0.2, 0.2),
+                                    n = 20,
+                                    weight_fun = weights_fujikawa,
+                                    logbase = exp(1)),
+               utility_params = list(thresh = 0.05),
+               algorithm_params = list(axes = list(lambda = c(0.01, seq(0.1, 0.9, 0.1)),
+                                    epsilon = c(seq(0.5, 3, 0.5),
+                                                c(5, 7.5, 10, 12.5)),
+                                    tau = c(0.01, seq(0.1, 0.9, 0.1)))),
+               x_names = c("lambda", "epsilon", "tau"))
 }
