@@ -69,6 +69,7 @@
 #'                algorithm_params = list(par = c(lambda = 0.99,
 #'                                                epsilon = 2,
 #'                                                tau = 0.5),
+#'                                        method = "SANN",
 #'                                        control = list(maxit = 1000,
 #'                                                       temp = 10,
 #'                                                       fnscale = -1)))
