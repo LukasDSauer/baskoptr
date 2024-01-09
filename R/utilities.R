@@ -22,12 +22,14 @@ u_ewp_discont <- function(design, x, detail_params, thresh) {
   weight_params <- list(epsilon = x[["epsilon"]], tau = x[["tau"]],
                         logbase = detail_params$logbase)
   detail_params <- detail_params[ - which(names(detail_params) == "logbase")]
-  fwer <-
-    do.call(toer, c(design = list(design), lambda = x[["lambda"]], detail_params,
-                    weight_params = list(weight_params)))
   ewp <-
     do.call(pow, c(design = list(design), lambda = x[["lambda"]],
                    detail_params, weight_params = list(weight_params)))
+  # Calculate FWER under global null
+  detail_params$p1 <- rep(design@p0, design@k)
+  fwer <-
+    do.call(toer, c(design = list(design), lambda = x[["lambda"]], detail_params,
+                    weight_params = list(weight_params)))
   if (fwer >= thresh) {
     return(-fwer)
   } else{
@@ -57,10 +59,14 @@ u_ewp_discont <- function(design, x, detail_params, thresh) {
 u_ewp_discont_sim <- function(design, x, detail_params, thresh) {
   details <- do.call(basksim::get_details,
                      c(design = list(design), as.list(x), detail_params))
-  fwer <-
-    details$FWER
   ewp <-
     details$EWP
+  # Calculate FWER under global null
+  detail_params$p1 <- rep(design$p0, design$k)
+  detailsfwer <- do.call(basksim::get_details,
+                     c(design = list(design), as.list(x), detail_params))
+  fwer <-
+    detailsfwer$FWER
   if (fwer >= thresh) {
     return(-fwer)
   } else{
