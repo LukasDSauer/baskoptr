@@ -2,4 +2,5 @@
 
 export(opt_design_gen)
 export(u_ewp_discont)
+export(u_ewp_discont_sim)
 import(baskexact)
