@@ -7,7 +7,7 @@ Authors@R:
            comment = c(ORCID = "0000-0002-1340-9994"))
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
-Suggests:
+Imports:
   optimizr,
   nloptr
 Encoding: UTF-8
