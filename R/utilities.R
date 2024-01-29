@@ -22,17 +22,31 @@ u_ewp_discont <- function(design, x, detail_params, thresh) {
   weight_params <- list(epsilon = x[["epsilon"]], tau = x[["tau"]],
                         logbase = detail_params$logbase)
   detail_params <- detail_params[ - which(names(detail_params) == "logbase")]
-  ewp <-
-    do.call(pow, c(design = list(design), lambda = x[["lambda"]],
-                   detail_params, weight_params = list(weight_params)))
+
+
   # Calculate FWER under global null
-  detail_params$p1 <- rep(design@p0, design@k)
+  detail_params_null <- detail_params
+  detail_params_null$p1 <- rep(design@p0, design@k)
   fwer <-
-    do.call(toer, c(design = list(design), lambda = x[["lambda"]], detail_params,
+    do.call(toer, c(design = list(design), lambda = x[["lambda"]],
+                    detail_params_null,
                     weight_params = list(weight_params)))
   if (fwer >= thresh) {
     return(-fwer)
   } else{
+    ewp <- tryCatch(do.call(pow, c(design = list(design), lambda = x[["lambda"]],
+                                   detail_params, weight_params = list(weight_params))),
+                    error = function(e){
+                      if(grepl("no true alternative hyoptheses, cannot compute power",
+                               e$message)){
+                        return(0)
+
+                      } else{
+                        stop(paste("Error in call to baskexact::pow. Original error",
+                                   "message:",
+                                   e$message))
+                      }
+                    })
     return(ewp)
   }
 }
@@ -134,16 +148,78 @@ u_2ewp <- function(design, x, detail_params, xi1, xi2, thresh) {
   weight_params <- list(epsilon = x[["epsilon"]], tau = x[["tau"]],
                         logbase = detail_params$logbase)
   detail_params <- detail_params[ - which(names(detail_params) == "logbase")]
-  ewp <-
-    do.call(pow, c(design = list(design), lambda = x[["lambda"]],
-                   detail_params, weight_params = list(weight_params)))
-  fwer <-
-    do.call(toer, c(design = list(design), lambda = x[["lambda"]], detail_params,
-                    weight_params = list(weight_params)))
+  ewp <- tryCatch(do.call(pow, c(design = list(design), lambda = x[["lambda"]],
+                          detail_params, weight_params = list(weight_params))),
+                  error = function(e){
+                    if(grepl("no true alternative hyoptheses, cannot compute power",
+                             e$message)){
+                      return(0)
+
+                    } else{
+                      stop(paste("Error in call to baskexact::pow. Original error",
+                                 "message:",
+                                 e$message))
+                    }
+                  })
+
+  fwer <- tryCatch(do.call(toer, c(design = list(design),
+                                   lambda = x[["lambda"]], detail_params,
+                                   weight_params = list(weight_params))),
+           error = function(e){
+             if(grepl("no true null hypotheses, cannot compute type 1 error rate",
+                      e$message)){
+               return(0)
+
+             } else{
+               stop(paste("Error in call to baskexact::toer. Original error",
+                          "message:",
+                          e$message))
+             }
+           })
   if(fwer > thresh){
     return(ewp - (xi1*fwer - xi2*(fwer - thresh)))
   } else{
     return(ewp - (xi1*fwer))
+  }
+}
+#' Utility function: Discontinuous number-of-correct-decisions function with type-I error penalty (exact)
+#'
+#' @param design An object of class `Basket` created by the function
+#'   `baskexact::setupOneStageBasket`.
+#' @param x  A named list of the design parameters to be optimized.
+#' @param detail_params A named list of parameters that need to be supplied to
+#'   `baskexact::ecd()` and `baskexact::pow()`.
+#'
+#' @return a numerical, the parameter combination's utility
+#' @export
+#'
+#' @examples
+#' design <- setupOneStageBasket(k = 3, shape1 = 1, shape2 = 1, p0 = 0.2)
+#' u_ecd_discont(design,
+#'               x = list(lambda = 0.99, epsilon = 2, tau = 0.5),
+#'               detail_params = list(p1 = c(0.5, 0.2, 0.2),
+#'                                    n = 20,
+#'                                    weight_fun = weights_fujikawa,
+#'                                    logbase = exp(1)),
+#'               thresh = 0.05)
+u_ecd_discont <- function(design, x, detail_params, thresh) {
+  weight_params <- list(epsilon = x[["epsilon"]], tau = x[["tau"]],
+                        logbase = detail_params$logbase)
+  detail_params <- detail_params[ - which(names(detail_params) == "logbase")]
+  # Calculate FWER under global null
+  detail_params_null <- detail_params
+  detail_params_null$p1 <- rep(design@p0, design@k)
+  fwer <-
+    do.call(toer, c(design = list(design), lambda = x[["lambda"]],
+                    detail_params_null,
+                    weight_params = list(weight_params)))
+  if (fwer >= thresh) {
+    return(-fwer)
+  } else{
+    ecd <-
+      do.call(ecd, c(design = list(design), lambda = x[["lambda"]],
+                     detail_params, weight_params = list(weight_params)))
+    return(ecd)
   }
 }
 #' Utility function: Scenario-averaged utility function
