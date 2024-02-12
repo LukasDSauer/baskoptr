@@ -2,9 +2,12 @@
 % Please edit documentation in R/extreme_borrowing.R
 \name{epsilon_extreme}
 \alias{epsilon_extreme}
-\title{Extreme borrowing cutoff for epsilon dependent on tau}
+\alias{tau_extreme}
+\title{Extreme borrowing cutoffs for borrowing in Fujikawa's design}
 \usage{
 epsilon_extreme(design, tau, detail_params)
+
+tau_extreme(design, epsilon, detail_params)
 }
 \arguments{
 \item{design}{An object of class \code{Basket} created by the function
@@ -16,12 +19,33 @@ design.}
 \item{detail_params}{A named list of parameters containing per-stratum
 sizes \code{n} and the base of the logarithm for calculating Jensen-Shannon
 divergence \code{logbase}.}
+
+\item{epsilon}{The optimization parameter \eqn{\varepsilon} of Fujikawa's basket trial
+design.}
 }
 \value{
 A numeric, the extreme borrowing cutoff for \eqn{\varepsilon}.
 }
 \description{
-Extreme borrowing cutoff for epsilon dependent on tau
+The weights for the borrowing posterior in Fujikawa's design are calculated
+as
+\deqn{\omega_{ij} = \mathbf{1}(\tilde\omega_{ij}^\varepsilon>\tau)\cdot\tilde\omega_{ij}^\varepsilon}
+with \eqn{\tau\in[0,1]}, \eqn{\varepsilon \geq 0}, and
+\eqn{\tilde\omega_{ij}= 1 - JS(\mathrm{Beta}_i^{\text{post}}, \mathrm{Beta}_j^{\text{post}})}.
+Here, \eqn{JS(\cdot,\cdot)} is the Jensen-Shannon divergence, and
+\deqn{\mathrm{Beta}_i^{\text{post}}=\mathrm{Beta}(a_i+r_i, b_i+n_i-r_i)}
+is the beta-binomial conjugated posterior distribution in  the \eqn{i}-th stratum
+for prior Beta parameters \eqn{a_i} an \eqn{b_i}, number of responses
+\eqn{r_i} and number of patients \eqn{n_i}. In particular for
+\deqn{\tilde\omega_{ij}^\varepsilon\leq\tau,}
+borrowing will only take place for baskets with completely identical response rates.
+We call this boundary the \emph{extreme borrowing cutoff}. The functions
+\code{epsilon_extreme} and \code{tau_extreme} calculate the extreme borrowing cutoffs
+\eqn{\tau_{\text{extreme}}(\varepsilon)} and
+\eqn{\varepsilon_{\text{extreme}}(\tau)}, which are the boundaries of
+\deqn{  \tau \geq (\max_{r_k\neq r_l}\tilde\omega_{kl})^\varepsilon }
+and
+\deqn{   \varepsilon \geq \log_{\max_{r_k\neq r_l}\tilde\omega_{kl}}(\tau).}
 }
 \examples{
 design <- basksim::setup_fujikawa(k = 3,
@@ -32,4 +56,5 @@ detail_params <- list(p1 = c(0.5, 0.2, 0.2),
                              n = 20,
                              logbase = exp(1))
 epsilon_extreme(design, tau = 0.5, detail_params)
+tau_extreme(design, epsilon = 2, detail_params)
 }

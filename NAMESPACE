@@ -2,6 +2,7 @@
 
 export(epsilon_extreme)
 export(opt_design_gen)
+export(tau_extreme)
 export(u_2ewp)
 export(u_avg)
 export(u_ecd_discont)
