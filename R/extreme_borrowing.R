@@ -20,6 +20,9 @@
 #' and
 #' \deqn{   \varepsilon \geq \log_{\max_{r_k\neq r_l}\tilde\omega_{kl}}(\tau).}
 #'
+#' The extreme borrowing cutoffs depend neither on `p0` nor on `p1`. They only
+#' depend on the number of baskets `k` and the number of patients per basket `n`.
+#'
 #' @inheritParams u_ewp_discont
 #' @param epsilon The optimization parameter \eqn{\varepsilon} of Fujikawa's basket trial
 #' design.
@@ -37,9 +40,8 @@
 #'                                  shape1 = 1,
 #'                                  shape2 = 1,
 #'                                  p0 = 0.2)
-#' detail_params <- list(p1 = c(0.5, 0.2, 0.2),
-#'                              n = 20,
-#'                              logbase = exp(1))
+#' detail_params <- list(n = 20,
+#'                       logbase = exp(1))
 #' epsilon_extreme(design, tau = 0.5, detail_params)
 #' tau_extreme(design, epsilon = 2, detail_params)
 epsilon_extreme <- function(design, tau, detail_params){

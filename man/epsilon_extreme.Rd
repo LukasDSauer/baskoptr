@@ -52,9 +52,8 @@ design <- basksim::setup_fujikawa(k = 3,
                                  shape1 = 1,
                                  shape2 = 1,
                                  p0 = 0.2)
-detail_params <- list(p1 = c(0.5, 0.2, 0.2),
-                             n = 20,
-                             logbase = exp(1))
+detail_params <- list(n = 20,
+                      logbase = exp(1))
 epsilon_extreme(design, tau = 0.5, detail_params)
 tau_extreme(design, epsilon = 2, detail_params)
 }
