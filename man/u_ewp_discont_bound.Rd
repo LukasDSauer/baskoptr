@@ -8,13 +8,13 @@ boundaries on the parameters}
 u_ewp_discont_bound(design, x, detail_params, thresh, lower, upper)
 }
 \arguments{
-\item{design}{An object of class \code{Basket} created by the function
-\code{baskexact::setupOneStageBasket}.}
+\item{design}{An object of class \code{fujikawa} created by the function
+\code{baskwrap::setup_fujikawa_x} or \code{basksim::setup_fujikawa}.}
 
 \item{x}{A named list of the design parameters to be optimized.}
 
 \item{detail_params}{A named list of parameters that need to be supplied to
-\code{baskexact::toer()} and \code{baskexact::pow()}.}
+\code{get_details()}.}
 
 \item{lower}{numerical, a vector of lower bounds of the parameters.}
 
@@ -25,12 +25,13 @@ Utility function: Discontinuous power function with type-I error penalty and
 boundaries on the parameters
 }
 \examples{
-design <- setupOneStageBasket(k = 3, shape1 = 1, shape2 = 1, p0 = 0.2)
+design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
+                                     p0 = 0.2, backend = "exact")
 u_ewp_discont_bound(design,
               x = list(lambda = 0.99, epsilon = 2, tau = 0.5),
               detail_params = list(p1 = c(0.5, 0.2, 0.2),
                                    n = 20,
-                                   weight_fun = weights_fujikawa,
+                                   weight_fun = baskexact::weights_fujikawa,
                                    logbase = exp(1)),
               thresh = 0.05,
                   lower = list(lambda = 0, epsilon = 1, tau = 0),

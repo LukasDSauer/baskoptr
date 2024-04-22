@@ -2,32 +2,41 @@
 % Please edit documentation in R/utilities.R
 \name{u_ewp_discont}
 \alias{u_ewp_discont}
-\title{Utility function: Discontinuous power function with type-I error penalty (exact)}
+\title{Utility function: Discontinuous power function with type-I error penalty (simulated)}
 \usage{
 u_ewp_discont(design, x, detail_params, thresh)
 }
 \arguments{
-\item{design}{An object of class \code{Basket} created by the function
-\code{baskexact::setupOneStageBasket}.}
+\item{design}{An object of class \code{fujikawa} created by the function
+\code{baskwrap::setup_fujikawa_x} or \code{basksim::setup_fujikawa}.}
 
 \item{x}{A named list of the design parameters to be optimized.}
 
 \item{detail_params}{A named list of parameters that need to be supplied to
-\code{baskexact::toer()} and \code{baskexact::pow()}.}
+\code{get_details()}.}
 }
 \value{
-a numerical, the parameter combination's utility
+a numeric, the parameter combination's utility
 }
 \description{
-Utility function: Discontinuous power function with type-I error penalty (exact)
+Utility function: Discontinuous power function with type-I error penalty (simulated)
 }
 \examples{
-design <- setupOneStageBasket(k = 3, shape1 = 1, shape2 = 1, p0 = 0.2)
+design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1, p0 = 0.2)
 u_ewp_discont(design,
               x = list(lambda = 0.99, epsilon = 2, tau = 0.5),
               detail_params = list(p1 = c(0.5, 0.2, 0.2),
                                    n = 20,
-                                   weight_fun = weights_fujikawa,
+                                   iter = 100,
+                                   logbase = exp(1)),
+              thresh = 0.05)
+design_x <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
+                                       p0 = 0.2, backend = "exact")
+u_ewp_discont(design,
+              x = list(lambda = 0.99, epsilon = 2, tau = 0.5),
+              detail_params = list(p1 = c(0.5, 0.2, 0.2),
+                                   n = 20,
+                                   weight_fun = baskexact::weights_fujikawa,
                                    logbase = exp(1)),
               thresh = 0.05)
 }

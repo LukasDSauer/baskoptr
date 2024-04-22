@@ -15,8 +15,8 @@ u_avg(
 )
 }
 \arguments{
-\item{design}{An object of class \code{Basket} created by the function
-\code{baskexact::setupOneStageBasket}.}
+\item{design}{An object of class \code{fujikawa} created by the function
+\code{baskwrap::setup_fujikawa_x} or \code{basksim::setup_fujikawa}.}
 
 \item{x}{A named list of the design parameters to be optimized.}
 
@@ -37,7 +37,7 @@ under the alternative hypothesis.}
 \item{weights_u}{A numeric vector of weights for calculating the weighted average.}
 }
 \value{
-a numerical, the parameter combination's utility
+a numeric, the parameter combination's utility
 }
 \description{
 For a utility function \eqn{u(\cdot, \mathbf p)} and a set of true scenarios
@@ -46,10 +46,11 @@ For a utility function \eqn{u(\cdot, \mathbf p)} and a set of true scenarios
 for a set of weights with \eqn{\sum_i w_i=1}. By default, \eqn{w_i=\frac{1}{|\{\mathbf p_i,\ldots\}|}} for all \eqn{i}.
 }
 \examples{
-design <- setupOneStageBasket(k = 3, shape1 = 1, shape2 = 1, p0 = 0.2)
+design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
+                                     p0 = 0.2, backend = "exact")
 x <- list(lambda = 0.99, epsilon = 2, tau = 0.5)
 detail_params <- list(n = 20,
-                      weight_fun = weights_fujikawa,
+                      weight_fun = baskexact::weights_fujikawa,
                       logbase = exp(1))
 p1s <- rbind(c(0.2,0.2,0.2), c(0.2,0.2,0.5), c(0.2,0.5,0.5), c(0.5,0.5,0.5))
 u_avg(design,

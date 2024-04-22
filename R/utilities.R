@@ -1,76 +1,33 @@
-#' Utility function: Discontinuous power function with type-I error penalty (exact)
+#' Utility function: Discontinuous power function with type-I error penalty (simulated)
 #'
-#' @param design An object of class `Basket` created by the function
-#'   `baskexact::setupOneStageBasket`.
+#' @param design An object of class `fujikawa` created by the function
+#'   `baskwrap::setup_fujikawa_x` or `basksim::setup_fujikawa`.
 #' @param x  A named list of the design parameters to be optimized.
 #' @param detail_params A named list of parameters that need to be supplied to
-#'   `baskexact::toer()` and `baskexact::pow()`.
+#'   `get_details()`.
 #'
-#' @return a numerical, the parameter combination's utility
+#' @return a numeric, the parameter combination's utility
 #' @export
 #'
 #' @examples
-#' design <- setupOneStageBasket(k = 3, shape1 = 1, shape2 = 1, p0 = 0.2)
+#' design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1, p0 = 0.2)
 #' u_ewp_discont(design,
 #'               x = list(lambda = 0.99, epsilon = 2, tau = 0.5),
 #'               detail_params = list(p1 = c(0.5, 0.2, 0.2),
 #'                                    n = 20,
-#'                                    weight_fun = weights_fujikawa,
+#'                                    iter = 100,
 #'                                    logbase = exp(1)),
 #'               thresh = 0.05)
-u_ewp_discont <- function(design, x, detail_params, thresh) {
-  weight_params <- list(epsilon = x[["epsilon"]], tau = x[["tau"]],
-                        logbase = detail_params$logbase)
-  detail_params <- detail_params[ - which(names(detail_params) == "logbase")]
-
-
-  # Calculate FWER under global null
-  detail_params_null <- detail_params
-  detail_params_null$p1 <- rep(design@p0, design@k)
-  fwer <-
-    do.call(toer, c(design = list(design), lambda = x[["lambda"]],
-                    detail_params_null,
-                    weight_params = list(weight_params)))
-  if (fwer >= thresh) {
-    return(-fwer)
-  } else{
-    ewp <- tryCatch(do.call(pow, c(design = list(design), lambda = x[["lambda"]],
-                                   detail_params, weight_params = list(weight_params))),
-                    error = function(e){
-                      if(grepl("no true alternative hyoptheses, cannot compute power",
-                               e$message)){
-                        return(0)
-
-                      } else{
-                        stop(paste("Error in call to baskexact::pow. Original error",
-                                   "message:",
-                                   e$message))
-                      }
-                    })
-    return(ewp)
-  }
-}
-#' Utility function: Discontinuous power function with type-I error penalty (simulated)
-#'
-#' @param design An object of class `fujikawa` created by the function
-#'   `basksim::setup_fujikawa`.
-#' @param x  A named list of the design parameters to be optimized.
-#' @param detail_params A named list of parameters that need to be supplied to
-#'   `basksim::get_details()`.
-#'
-#' @return a numerical, the parameter combination's utility
-#' @export
-#'
-#' @examples
-#' design <- basksim::setup_fujikawa(k = 3, shape1 = 1, shape2 = 1, p0 = 0.2)
-#' u_ewp_discont_sim(design,
+#' design_x <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
+#'                                        p0 = 0.2, backend = "exact")
+#' u_ewp_discont(design,
 #'               x = list(lambda = 0.99, epsilon = 2, tau = 0.5),
 #'               detail_params = list(p1 = c(0.5, 0.2, 0.2),
 #'                                    n = 20,
-#'                                    iter = 1000,
+#'                                    weight_fun = baskexact::weights_fujikawa,
 #'                                    logbase = exp(1)),
 #'               thresh = 0.05)
-u_ewp_discont_sim <- function(design, x, detail_params, thresh) {
+u_ewp_discont <- function(design, x, detail_params, thresh) {
   details <- do.call(basksim::get_details,
                      c(design = list(design), as.list(x), detail_params))
   ewp <-
@@ -94,12 +51,13 @@ u_ewp_discont_sim <- function(design, x, detail_params, thresh) {
 #' @param lower numerical, a vector of lower bounds of the parameters.
 #' @param upper numerical, a vector of upper bounds of the parameters.
 #' @examples
-#' design <- setupOneStageBasket(k = 3, shape1 = 1, shape2 = 1, p0 = 0.2)
+#' design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
+#'                                      p0 = 0.2, backend = "exact")
 #' u_ewp_discont_bound(design,
 #'               x = list(lambda = 0.99, epsilon = 2, tau = 0.5),
 #'               detail_params = list(p1 = c(0.5, 0.2, 0.2),
 #'                                    n = 20,
-#'                                    weight_fun = weights_fujikawa,
+#'                                    weight_fun = baskexact::weights_fujikawa,
 #'                                    logbase = exp(1)),
 #'               thresh = 0.05,
 #'                   lower = list(lambda = 0, epsilon = 1, tau = 0),
@@ -135,47 +93,26 @@ u_ewp_discont_bound <-
 #' @export
 #'
 #' @examples
-#' design <- setupOneStageBasket(k = 3, shape1 = 1, shape2 = 1, p0 = 0.2)
+#' design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
+#'                                      p0 = 0.2, backend = "exact")
 #' u_2ewp(design,
-#'               x = list(lambda = 0.99, epsilon = 2, tau = 0.5),
-#'               detail_params = list(p1 = c(0.5, 0.2, 0.2),
-#'                                    n = 20,
-#'                                    weight_fun = weights_fujikawa,
-#'                                    logbase = exp(1)),
-#'               xi1 = 1, xi2 = 2,
-#'               thresh = 0.1)
+#'        x = list(lambda = 0.99, epsilon = 2, tau = 0.5),
+#'        detail_params = list(p1 = c(0.5, 0.2, 0.2),
+#'                             n = 20,
+#'                             weight_fun = baskexact::weights_fujikawa,
+#'                             logbase = exp(1)),
+#'        xi1 = 1, xi2 = 2,
+#'        thresh = 0.1)
 u_2ewp <- function(design, x, detail_params, xi1, xi2, thresh) {
   weight_params <- list(epsilon = x[["epsilon"]], tau = x[["tau"]],
                         logbase = detail_params$logbase)
   detail_params <- detail_params[ - which(names(detail_params) == "logbase")]
-  ewp <- tryCatch(do.call(pow, c(design = list(design), lambda = x[["lambda"]],
-                          detail_params, weight_params = list(weight_params))),
-                  error = function(e){
-                    if(grepl("no true alternative hyoptheses, cannot compute power",
-                             e$message)){
-                      return(0)
+  ewp <- do.call(pow, c(design = list(design), lambda = x[["lambda"]],
+                 detail_params, weight_params = list(weight_params)))
 
-                    } else{
-                      stop(paste("Error in call to baskexact::pow. Original error",
-                                 "message:",
-                                 e$message))
-                    }
-                  })
-
-  fwer <- tryCatch(do.call(toer, c(design = list(design),
-                                   lambda = x[["lambda"]], detail_params,
-                                   weight_params = list(weight_params))),
-           error = function(e){
-             if(grepl("no true null hypotheses, cannot compute type 1 error rate",
-                      e$message)){
-               return(0)
-
-             } else{
-               stop(paste("Error in call to baskexact::toer. Original error",
-                          "message:",
-                          e$message))
-             }
-           })
+  fwer <- do.call(toer, c(design = list(design),
+                          lambda = x[["lambda"]], detail_params,
+                          weight_params = list(weight_params)))
   if(fwer > thresh){
     return(ewp - (xi1*fwer - xi2*(fwer - thresh)))
   } else{
@@ -185,7 +122,7 @@ u_2ewp <- function(design, x, detail_params, xi1, xi2, thresh) {
 #' Utility function: Discontinuous number-of-correct-decisions function with type-I error penalty (exact)
 #'
 #' @param design An object of class `Basket` created by the function
-#'   `baskexact::setupOneStageBasket`.
+#'   `baskwrap::setup_fujikawa_x`.
 #' @param x  A named list of the design parameters to be optimized.
 #' @param detail_params A named list of parameters that need to be supplied to
 #'   `baskexact::ecd()` and `baskexact::pow()`.
@@ -194,12 +131,13 @@ u_2ewp <- function(design, x, detail_params, xi1, xi2, thresh) {
 #' @export
 #'
 #' @examples
-#' design <- setupOneStageBasket(k = 3, shape1 = 1, shape2 = 1, p0 = 0.2)
+#' design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
+#'                                      p0 = 0.2, backend = "exact")
 #' u_ecd_discont(design,
 #'               x = list(lambda = 0.99, epsilon = 2, tau = 0.5),
 #'               detail_params = list(p1 = c(0.5, 0.2, 0.2),
 #'                                    n = 20,
-#'                                    weight_fun = weights_fujikawa,
+#'                                    weight_fun = baskexact::weights_fujikawa,
 #'                                    logbase = exp(1)),
 #'               thresh = 0.05)
 u_ecd_discont <- function(design, x, detail_params, thresh) {
@@ -243,10 +181,11 @@ u_ecd_discont <- function(design, x, detail_params, thresh) {
 #' @export
 #'
 #' @examples
-#' design <- setupOneStageBasket(k = 3, shape1 = 1, shape2 = 1, p0 = 0.2)
+#' design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
+#'                                      p0 = 0.2, backend = "exact")
 #' x <- list(lambda = 0.99, epsilon = 2, tau = 0.5)
 #' detail_params <- list(n = 20,
-#'                       weight_fun = weights_fujikawa,
+#'                       weight_fun = baskexact::weights_fujikawa,
 #'                       logbase = exp(1))
 #' p1s <- rbind(c(0.2,0.2,0.2), c(0.2,0.2,0.5), c(0.2,0.5,0.5), c(0.5,0.5,0.5))
 #' u_avg(design,

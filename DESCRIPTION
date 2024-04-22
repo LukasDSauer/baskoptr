@@ -1,5 +1,5 @@
 Package: baskoptr
-Title: What the Package Does (One Line, Title Case)
+Title: Utility-based Optimization for Basket Trial Designs
 Version: 0.0.1
 Description: What the package does (one paragraph).
 Authors@R: 
@@ -9,8 +9,10 @@ License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Imports:
   optimizr,
-  nloptr
+  nloptr,
+  baskwrap,
+  baskexact,
+  basksim
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
-
+RoxygenNote: 7.3.1

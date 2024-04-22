@@ -10,8 +10,8 @@ epsilon_extreme(design, tau, detail_params)
 tau_extreme(design, epsilon, detail_params)
 }
 \arguments{
-\item{design}{An object of class \code{Basket} created by the function
-\code{baskexact::setupOneStageBasket}.}
+\item{design}{An object of class \code{fujikawa} created by the function
+\code{baskwrap::setup_fujikawa_x} or \code{basksim::setup_fujikawa}.}
 
 \item{tau}{The optimization parameter \eqn{\tau} of Fujikawa's basket trial
 design.}
@@ -46,6 +46,10 @@ We call this boundary the \emph{extreme borrowing cutoff}. The functions
 \deqn{  \tau \geq (\max_{r_k\neq r_l}\tilde\omega_{kl})^\varepsilon }
 and
 \deqn{   \varepsilon \geq \log_{\max_{r_k\neq r_l}\tilde\omega_{kl}}(\tau).}
+}
+\details{
+The extreme borrowing cutoffs depend neither on \code{p0} nor on \code{p1}. They only
+depend on the number of baskets \code{k} and the number of patients per basket \code{n}.
 }
 \examples{
 design <- basksim::setup_fujikawa(k = 3,

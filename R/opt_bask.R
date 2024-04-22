@@ -30,10 +30,11 @@
 #' @examples
 #' # Optimizing a three-basket trial design using Fujikawa's beta-binomial
 #' # sharing approach with four different optimization algorithms
-#' design <- setupOneStageBasket(k = 3, shape1 = 1, shape2 = 1, p0 = 0.2)
+#' design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
+#'                                      p0 = 0.2, backend = "exact")
 #' detail_params <- list(p1 = c(0.5, 0.2, 0.2),
 #'                                     n = 20,
-#'                                     weight_fun = weights_fujikawa,
+#'                                     weight_fun = baskexact::weights_fujikawa,
 #'                                     logbase = exp(1))
 #' utility_params <- list(thresh = 0.05)
 #' # Bounded simulated annealing
