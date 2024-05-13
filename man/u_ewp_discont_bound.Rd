@@ -16,6 +16,8 @@ u_ewp_discont_bound(design, x, detail_params, thresh, lower, upper)
 \item{detail_params}{A named list of parameters that need to be supplied to
 \code{get_details()}.}
 
+\item{thresh}{A numeric, for high FWER above this treshold we impose harder penalty.}
+
 \item{lower}{numerical, a vector of lower bounds of the parameters.}
 
 \item{upper}{numerical, a vector of upper bounds of the parameters.}

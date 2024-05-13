@@ -14,6 +14,8 @@ u_ewp_discont(design, x, detail_params, thresh)
 
 \item{detail_params}{A named list of parameters that need to be supplied to
 \code{get_details()}.}
+
+\item{thresh}{A numeric, for high FWER above this treshold we impose harder penalty.}
 }
 \value{
 a numeric, the parameter combination's utility

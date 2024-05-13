@@ -5,6 +5,7 @@
 #' @param x  A named list of the design parameters to be optimized.
 #' @param detail_params A named list of parameters that need to be supplied to
 #'   `get_details()`.
+#' @param thresh A numeric, for high FWER above this treshold we impose harder penalty.
 #'
 #' @return a numeric, the parameter combination's utility
 #' @export
@@ -87,7 +88,6 @@ u_ewp_discont_bound <-
 #' @inheritParams u_ewp_discont
 #' @param xi1 A numeric, `xi1` is the penalty for low FWER,
 #' @param xi2 A numeric, `xi1 + xi2` is the penalty for high FWER,
-#' @param thresh A numeric, for high FWER above this treshold we impose harder penalty.
 #'
 #' @return a numerical, the parameter combination's utility
 #' @export
@@ -118,6 +118,9 @@ u_2ewp <- function(design, x, detail_params, xi1, xi2, thresh) {
   } else{
     return(ewp - (xi1*fwer))
   }
+}
+u_2pow <- function(design, x, detail_params, xi1, xi2, thresh) {
+
 }
 #' Utility function: Discontinuous number-of-correct-decisions function with type-I error penalty (exact)
 #'

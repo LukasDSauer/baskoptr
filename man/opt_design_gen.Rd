@@ -77,15 +77,12 @@ opt_design_gen(design = design,
                                        upper = c(lambda = 0.999,
                                                  epsilon = 10,
                                                  tau = 0.999),
-                                       control = list(maxit = 1000,
+                                       control = list(maxit = 10,
                                                       temp = 10,
                                                       fnscale = -1)))
 # Bounded simulated annealing with basksim
-opt_design_gen(design = basksim::setup_fujikawa(k = design@k,
-                                                shape1 = design@shape1,
-                                                shape2 = design@shape2,
-                                                p0 = design@p0),
-               utility = u_ewp_discont_sim,
+opt_design_gen(design = design,
+               utility = u_ewp_discont,
                algorithm = optimizr::simann,
                detail_params = list(p1 = detail_params$p1,
                                     n = detail_params$n,
@@ -101,7 +98,7 @@ opt_design_gen(design = basksim::setup_fujikawa(k = design@k,
                                        upper = c(lambda = 0.999,
                                                  epsilon = 10,
                                                  tau = 0.999),
-                                       control = list(maxit = 1000,
+                                       control = list(maxit = 10,
                                                       temp = 10,
                                                       fnscale = -1)))
 # Unbounded simulated annealing
@@ -120,7 +117,7 @@ opt_design_gen(design = design,
                                                epsilon = 2,
                                                tau = 0.5),
                                        method = "SANN",
-                                       control = list(maxit = 1000,
+                                       control = list(maxit = 10,
                                                       temp = 10,
                                                       fnscale = -1)))
 # Grid search
@@ -153,5 +150,5 @@ opt_design_gen(design = design,
                                                  epsilon = 10,
                                                  tau = 0.999),
                                        nl.info = TRUE,
-                                       control = list(maxeval = 1000)))
+                                       control = list(maxeval = 10)))
 }
