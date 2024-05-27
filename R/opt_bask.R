@@ -29,7 +29,7 @@
 #'
 #' @examples
 #' # Optimizing a three-basket trial design using Fujikawa's beta-binomial
-#' # sharing approach with four different optimization algorithms
+#' # sharing approach
 #' design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
 #'                                      p0 = 0.2, backend = "exact")
 #' detail_params <- list(p1 = c(0.5, 0.2, 0.2),
@@ -55,77 +55,6 @@
 #'                                        control = list(maxit = 10,
 #'                                                       temp = 10,
 #'                                                       fnscale = -1)))
-#' # Bounded simulated annealing with basksim
-#' opt_design_gen(design = design,
-#'                utility = u_ewp_discont,
-#'                algorithm = optimizr::simann,
-#'                detail_params = list(p1 = detail_params$p1,
-#'                                     n = detail_params$n,
-#'                                     iter = 1000,
-#'                                     logbase = detail_params$logbase),
-#'                utility_params = utility_params,
-#'                algorithm_params = list(par = c(lambda = 0.99,
-#'                                                epsilon = 2,
-#'                                                tau = 0.5),
-#'                                        lower = c(lambda = 0.001,
-#'                                                  epsilon = 1,
-#'                                                  tau = 0.001),
-#'                                        upper = c(lambda = 0.999,
-#'                                                  epsilon = 10,
-#'                                                  tau = 0.999),
-#'                                        control = list(maxit = 10,
-#'                                                       temp = 10,
-#'                                                       fnscale = -1)))
-#' # Unbounded simulated annealing
-#' opt_design_gen(design = design,
-#'                utility = u_ewp_discont_bound,
-#'                algorithm = optim,
-#'                detail_params = detail_params,
-#'                utility_params = c(utility_params,
-#'                                   list(lower = c(lambda = 0.001,
-#'                                                epsilon = 1,
-#'                                                tau = 0.001),
-#'                                        upper = c(lambda = 0.999,
-#'                                                  epsilon = 10,
-#'                                                  tau = 0.999))),
-#'                algorithm_params = list(par = c(lambda = 0.99,
-#'                                                epsilon = 2,
-#'                                                tau = 0.5),
-#'                                        method = "SANN",
-#'                                        control = list(maxit = 10,
-#'                                                       temp = 10,
-#'                                                       fnscale = -1)))
-#' # Grid search
-#' axes = list(lambda = c(0.01, seq(0.1, 0.9, 0.1)),
-#'                                     epsilon = c(seq(0.5, 3, 0.5),
-#'                                                 c(5, 7.5, 10, 12.5)),
-#'                                     tau = c(0.01, seq(0.1, 0.9, 0.1)))
-#' opt_design_gen(design = design,
-#'                utility = u_ewp_discont,
-#'                algorithm = optimizr::gridsearch,
-#'                detail_params = detail_params,
-#'                utility_params = utility_params,
-#'                algorithm_params = list(axes = axes,
-#'                                        control = list(fnscale = -1)),
-#'                x_names = names(axes))
-#' # Constrained optimization by linear approximations
-#' opt_design_gen(design = design,
-#'                utility = u_max <-
-#'                   function(design, x, detail_params, thresh) {
-#'                       (-1)*u_ewp_discont(design, x, detail_params, thresh)
-#'                   },
-#'                algorithm = nloptr::cobyla,
-#'                detail_params = detail_params,
-#'                utility_params = utility_params,
-#'                algorithm_params = list(x0 = c(lambda = 0.99, epsilon = 2,
-#'                                               tau = 0.5),
-#'                                        lower = c(lambda = 0.001, epsilon = 1,
-#'                                                  tau = 0.001),
-#'                                        upper = c(lambda = 0.999,
-#'                                                  epsilon = 10,
-#'                                                  tau = 0.999),
-#'                                        nl.info = TRUE,
-#'                                        control = list(maxeval = 10)))
 opt_design_gen <- function(design, utility, algorithm, detail_params,
                            utility_params, algorithm_params, trace = TRUE,
                            x_names = NULL){
