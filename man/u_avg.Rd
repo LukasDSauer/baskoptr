@@ -21,7 +21,7 @@ u_avg(
 \item{x}{A named list of the design parameters to be optimized.}
 
 \item{detail_params}{A named list of parameters that need to be supplied to
-\code{baskexact::toer()} and \code{baskexact::pow()}. It must not contain \code{p1},
+\code{get_details()}. It must not contain \code{p1},
 as this is supplied separately.}
 
 \item{utility}{A function returning the utility of a parameter combination

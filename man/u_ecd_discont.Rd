@@ -7,16 +7,18 @@
 u_ecd_discont(design, x, detail_params, thresh)
 }
 \arguments{
-\item{design}{An object of class \code{Basket} created by the function
-\code{baskwrap::setup_fujikawa_x}.}
+\item{design}{An object of class \code{fujikawa} created by the function
+\code{baskwrap::setup_fujikawa_x} or \code{basksim::setup_fujikawa}.}
 
 \item{x}{A named list of the design parameters to be optimized.}
 
 \item{detail_params}{A named list of parameters that need to be supplied to
-\code{baskexact::ecd()} and \code{baskexact::pow()}.}
+\code{get_details()}.}
+
+\item{thresh}{A numeric, for high FWER above this treshold we impose harder penalty.}
 }
 \value{
-a numerical, the parameter combination's utility
+a numeric, the parameter combination's utility
 }
 \description{
 Utility function: Discontinuous number-of-correct-decisions function with type-I error penalty (exact)

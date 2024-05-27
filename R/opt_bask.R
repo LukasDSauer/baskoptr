@@ -79,5 +79,6 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
   res <- do.call(algorithm,
                  c(fn = u_fun,
                    algorithm_params))
+  return(res)
 }
 

@@ -22,6 +22,9 @@ u_ewp_discont_bound(design, x, detail_params, thresh, lower, upper)
 
 \item{upper}{numerical, a vector of upper bounds of the parameters.}
 }
+\value{
+a numeric, the parameter combination's utility
+}
 \description{
 Utility function: Discontinuous power function with type-I error penalty and
 boundaries on the parameters

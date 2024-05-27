@@ -29,13 +29,13 @@
 #'                                    logbase = exp(1)),
 #'               thresh = 0.05)
 u_ewp_discont <- function(design, x, detail_params, thresh) {
-  details <- do.call(basksim::get_details,
+  details <- do.call(baskwrap::get_details,
                      c(design = list(design), as.list(x), detail_params))
   ewp <-
     details$EWP
   # Calculate FWER under global null
   detail_params$p1 <- rep(design$p0, design$k)
-  detailsfwer <- do.call(basksim::get_details,
+  detailsfwer <- do.call(baskwrap::get_details,
                      c(design = list(design), as.list(x), detail_params))
   fwer <-
     detailsfwer$FWER
@@ -51,6 +51,9 @@ u_ewp_discont <- function(design, x, detail_params, thresh) {
 #' @inheritParams u_ewp_discont
 #' @param lower numerical, a vector of lower bounds of the parameters.
 #' @param upper numerical, a vector of upper bounds of the parameters.
+#'
+#' @inherit u_ewp_discont return
+#'
 #' @examples
 #' design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
 #'                                      p0 = 0.2, backend = "exact")
@@ -89,7 +92,7 @@ u_ewp_discont_bound <-
 #' @param xi1 A numeric, `xi1` is the penalty for low FWER,
 #' @param xi2 A numeric, `xi1 + xi2` is the penalty for high FWER,
 #'
-#' @return a numerical, the parameter combination's utility
+#' @inherit u_ewp_discont return
 #' @export
 #'
 #' @examples
@@ -106,13 +109,11 @@ u_ewp_discont_bound <-
 u_2ewp <- function(design, x, detail_params, xi1, xi2, thresh) {
   weight_params <- list(epsilon = x[["epsilon"]], tau = x[["tau"]],
                         logbase = detail_params$logbase)
-  detail_params <- detail_params[ - which(names(detail_params) == "logbase")]
-  ewp <- do.call(pow, c(design = list(design), lambda = x[["lambda"]],
-                 detail_params, weight_params = list(weight_params)))
-
-  fwer <- do.call(toer, c(design = list(design),
-                          lambda = x[["lambda"]], detail_params,
-                          weight_params = list(weight_params)))
+  details <- do.call(baskwrap::get_details,
+                     c(design = list(design), as.list(x), detail_params))
+  ewp <-
+    details$EWP
+  fwer <- details$FWER
   if(fwer > thresh){
     return(ewp - (xi1*fwer - xi2*(fwer - thresh)))
   } else{
@@ -124,13 +125,9 @@ u_2pow <- function(design, x, detail_params, xi1, xi2, thresh) {
 }
 #' Utility function: Discontinuous number-of-correct-decisions function with type-I error penalty (exact)
 #'
-#' @param design An object of class `Basket` created by the function
-#'   `baskwrap::setup_fujikawa_x`.
-#' @param x  A named list of the design parameters to be optimized.
-#' @param detail_params A named list of parameters that need to be supplied to
-#'   `baskexact::ecd()` and `baskexact::pow()`.
+#' @inheritParams u_ewp_discont
 #'
-#' @return a numerical, the parameter combination's utility
+#' @inherit u_ewp_discont return
 #' @export
 #'
 #' @examples
@@ -172,7 +169,7 @@ u_ecd_discont <- function(design, x, detail_params, thresh) {
 #'
 #' @inheritParams u_ewp_discont
 #' @param detail_params A named list of parameters that need to be supplied to
-#'   `baskexact::toer()` and `baskexact::pow()`. It must not contain `p1`,
+#'   `get_details()`. It must not contain `p1`,
 #'   as this is supplied separately.
 #' @inheritParams opt_design_gen
 #' @param p1s A numeric array in which each row defines a scenario of true response rates

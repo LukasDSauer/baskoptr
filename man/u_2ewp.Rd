@@ -22,7 +22,7 @@ u_2ewp(design, x, detail_params, xi1, xi2, thresh)
 \item{thresh}{A numeric, for high FWER above this treshold we impose harder penalty.}
 }
 \value{
-a numerical, the parameter combination's utility
+a numeric, the parameter combination's utility
 }
 \description{
 This utility function is defined as
