@@ -45,40 +45,6 @@ u_ewp_discont <- function(design, x, detail_params, thresh) {
     return(ewp)
   }
 }
-#' Utility function: Discontinuous power function with type-I error penalty and
-#' boundaries on the parameters
-#'
-#' @inheritParams u_ewp_discont
-#' @param lower numerical, a vector of lower bounds of the parameters.
-#' @param upper numerical, a vector of upper bounds of the parameters.
-#'
-#' @inherit u_ewp_discont return
-#'
-#' @examples
-#' design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
-#'                                      p0 = 0.2, backend = "exact")
-#' u_ewp_discont_bound(design,
-#'               x = list(lambda = 0.99, epsilon = 2, tau = 0.5),
-#'               detail_params = list(p1 = c(0.5, 0.2, 0.2),
-#'                                    n = 20,
-#'                                    weight_fun = baskexact::weights_fujikawa,
-#'                                    logbase = exp(1)),
-#'               thresh = 0.05,
-#'                   lower = list(lambda = 0, epsilon = 1, tau = 0),
-#'                   upper = list(lambda = 1, epsilon = 10, tau = 1))
-u_ewp_discont_bound <-
-  function(design,
-           x,
-           detail_params,
-           thresh,
-           lower,
-           upper) {
-    if (!all(lower <= x) | !(all(x <= upper))) {
-      return(NA_real_)
-    } else{
-      return(u_ewp_discont(design, x, detail_params, thresh))
-    }
-  }
 #' Utility function: Two-level family-wise power-error function
 #'
 #' This utility function is defined as
@@ -213,3 +179,36 @@ u_avg <- function(design, x, detail_params, utility, utility_params,
   return(sum(u_vals*weights_u))
 }
 
+#' Utility function with boundaries on the parameters
+#'
+#' @inheritParams u_ewp_discont
+#' @param lower numerical, a vector of lower bounds of the parameters.
+#' @param upper numerical, a vector of upper bounds of the parameters.
+#'
+#' @inherit u_ewp_discont return
+#'
+#' @examples
+#' design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
+#'                                      p0 = 0.2, backend = "exact")
+#' u_bnd(design,
+#'       x = c(lambda = 0.99, epsilon = 2, tau = 0.5),
+#'       detail_params = list(p1 = c(0.5, 0.2, 0.2),
+#'                            n = 20,
+#'                            weight_fun = baskexact::weights_fujikawa,
+#'                            logbase = exp(1)),
+#'       utility = u_ewp_discont,
+#'       utility_params = list(thresh = 0.05),
+#'       lower = c(lambda = 0, epsilon = 1, tau = 0),
+#'       upper = c(lambda = 1, epsilon = 10, tau = 1))
+u_bnd <-
+  function(design, x, detail_params, utility, utility_params,
+           lower, upper) {
+    if (!all(lower <= x) | !(all(x <= upper))) {
+      return(NA_real_)
+    } else{
+      return(utility(design = design,
+                     x = x,
+                     detail_params = detail_params,
+                     utility_params))
+    }
+  }
