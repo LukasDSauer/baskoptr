@@ -10,32 +10,58 @@ u_bnd(design, x, detail_params, utility, utility_params, lower, upper)
 \item{design}{An object of class \code{fujikawa} created by the function
 \code{baskwrap::setup_fujikawa_x} or \code{basksim::setup_fujikawa}.}
 
-\item{x}{A named list of the design parameters to be optimized.}
+\item{x}{A named list, the design's tuning parameters to be optimized.}
 
 \item{detail_params}{A named list of parameters that need to be supplied to
 \code{get_details()}.}
+
+\item{utility}{A function returning the utility of a parameter combination
+\code{x} of the form \code{utility(design, x, detail_params, ...)}, where \code{...} may
+further parameters to be supplied to the utility.}
+
+\item{utility_params}{A named list of further parameters that need to be
+supplied to  the utility function.}
 
 \item{lower}{numerical, a vector of lower bounds of the parameters.}
 
 \item{upper}{numerical, a vector of upper bounds of the parameters.}
 }
 \value{
-a numeric, the parameter combination's utility
+A numeric, the parameter combination's utility.
 }
 \description{
-Utility function with boundaries on the parameters
+This function manually implements boundaries for a given utility function
+\code{utility}. If the vector \code{x} lies out of the lower and upper bounds, the
+function returns \code{NA_real_}. Else it returns the utility functions value.
 }
 \examples{
 design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
                                      p0 = 0.2, backend = "exact")
-u_bnd(design,
-      x = c(lambda = 0.99, epsilon = 2, tau = 0.5),
-      detail_params = list(p1 = c(0.5, 0.2, 0.2),
-                           n = 20,
-                           weight_fun = baskexact::weights_fujikawa,
-                           logbase = exp(1)),
-      utility = u_ewp_discont,
-      utility_params = list(thresh = 0.05),
-      lower = c(lambda = 0, epsilon = 1, tau = 0),
-      upper = c(lambda = 1, epsilon = 10, tau = 1))
+lower <- list(lambda = 0, epsilon = 1, tau = 0)
+upper <- list(lambda = 1, epsilon = 10, tau = 1)
+utility_params <- list(penalty = 1, threshold = 0.1)
+detail_params <- list(p1 = c(0.5, 0.2, 0.2),
+                      n = 20,
+                      weight_fun = baskexact::weights_fujikawa,
+                      logbase = exp(1))
+# Out of bounds
+u_bnd(design = design,
+      x = list(lambda = 1.3, epsilon = 2, tau = 0.5),
+      detail_params = detail_params,
+      utility = u_ewp,
+      utility_params = utility_params,
+      lower = lower,
+      upper = upper)
+# Inside bounds, this is the same as u_ewp
+x <- list(lambda = 0.99, epsilon = 2, tau = 0.5)
+u_bnd(design = design,
+      x = x,
+      detail_params = detail_params,
+      utility = u_ewp,
+      utility_params = utility_params,
+      lower = lower,
+      upper = upper)
+u_ewp(design = design,
+      x = x,
+      detail_params = detail_params, penalty = 1, threshold = 0.1)
 }

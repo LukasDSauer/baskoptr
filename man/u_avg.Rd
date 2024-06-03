@@ -18,32 +18,34 @@ u_avg(
 \item{design}{An object of class \code{fujikawa} created by the function
 \code{baskwrap::setup_fujikawa_x} or \code{basksim::setup_fujikawa}.}
 
-\item{x}{A named list of the design parameters to be optimized.}
+\item{x}{A named list, the design's tuning parameters to be optimized.}
 
 \item{detail_params}{A named list of parameters that need to be supplied to
 \code{get_details()}. It must not contain \code{p1},
 as this is supplied separately.}
 
 \item{utility}{A function returning the utility of a parameter combination
-\code{x}, of the form \code{utility(design, x, detail_params, ...)}, where \code{...} may
+\code{x} of the form \code{utility(design, x, detail_params, ...)}, where \code{...} may
 further parameters to be supplied to the utility.}
 
 \item{utility_params}{A named list of further parameters that need to be
 supplied to  the utility function.}
 
-\item{p1s}{A numeric array in which each row defines a scenario of true response rates
-under the alternative hypothesis.}
+\item{p1s}{A numeric array in which each row defines a scenario of true
+response rates under the alternative hypothesis.}
 
-\item{weights_u}{A numeric vector of weights for calculating the weighted average.}
+\item{weights_u}{A numeric vector of weights for calculating the weighted
+average.}
 }
 \value{
-a numeric, the parameter combination's utility
+A numeric, the parameter combination's utility.
 }
 \description{
 For a utility function \eqn{u(\cdot, \mathbf p)} and a set of true scenarios
 \eqn{\{\mathbf p_i,\ldots\}}, calculate the weighted average utility function
 \deqn{ \bar u(x) = \sum_i w_i u(x, \mathbf p_i)}
-for a set of weights with \eqn{\sum_i w_i=1}. By default, \eqn{w_i=\frac{1}{|\{\mathbf p_i,\ldots\}|}} for all \eqn{i}.
+for a set of weights with \eqn{\sum_i w_i=1}. By default,
+\eqn{w_i=\frac{1}{|\{\mathbf p_i,\ldots\}|}} for all \eqn{i}.
 }
 \examples{
 design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
@@ -56,15 +58,15 @@ p1s <- rbind(c(0.2,0.2,0.2), c(0.2,0.2,0.5), c(0.2,0.5,0.5), c(0.5,0.5,0.5))
 u_avg(design,
       x = x,
       detail_params = detail_params,
-      utility = u_ewp_discont,
-      utility_params = list(thresh = 0.05),
+      utility = u_ewp,
+      utility_params = list(penalty = 1, threshold = 0.1),
       p1s = p1s
       )
 u_avg(design,
       x = x,
       detail_params = detail_params,
       utility = u_2ewp,
-      utility_params = list(xi1 = 1, xi2 = 2, thresh = 0.1),
+      utility_params = list(penalty1 = 1, penalty2 = 2, threshold = 0.1),
       p1s = p1s
       )
 }

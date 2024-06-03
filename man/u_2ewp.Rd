@@ -2,35 +2,45 @@
 % Please edit documentation in R/utilities.R
 \name{u_2ewp}
 \alias{u_2ewp}
-\title{Utility function: Two-level family-wise power-error function}
+\alias{u_2pow}
+\title{Utility functions: Two-level power-error combination functions}
 \usage{
-u_2ewp(design, x, detail_params, xi1, xi2, thresh)
+u_2ewp(design, x, detail_params, penalty1, penalty2, threshold)
+
+u_2pow(design, x, detail_params, penalty1, penalty2, threshold)
 }
 \arguments{
 \item{design}{An object of class \code{fujikawa} created by the function
 \code{baskwrap::setup_fujikawa_x} or \code{basksim::setup_fujikawa}.}
 
-\item{x}{A named list of the design parameters to be optimized.}
+\item{x}{A named list, the design's tuning parameters to be optimized.}
 
 \item{detail_params}{A named list of parameters that need to be supplied to
 \code{get_details()}.}
 
-\item{xi1}{A numeric, \code{xi1} is the penalty for low FWER,}
+\item{penalty1}{A numeric, \code{penalty1} is the penalty for low FWER,}
 
-\item{xi2}{A numeric, \code{xi1 + xi2} is the penalty for high FWER,}
+\item{penalty2}{A numeric, \code{penalty1 + penalty2} is the penalty for high
+FWER.}
 
-\item{thresh}{A numeric, for high FWER above this treshold we impose harder penalty.}
+\item{threshold}{A numeric, for high FWER above this threshold we impose a
+harsher penalty.}
 }
 \value{
-a numeric, the parameter combination's utility
+A numeric, the parameter combination's utility.
 }
 \description{
-This utility function is defined as
+These utility functions combine rewarding power and penalizing TOER by
+subtracting TOER from power. In addition, unacceptably high FWER above a
+certain threshold receives harsher penalty.
+}
+\details{
+The utility function \eqn{u_{\text{2ewp}}} is defined as
 \deqn{u_{\text{2ewp}}(\boldsymbol\phi,\mathbf{p}) = \mathrm{ewp}(\boldsymbol
 \phi,\mathbf{p}) - \left(\xi_1\mathrm{fwer}(\boldsymbol\phi,\mathbf{p}) +
 \xi_2(\mathrm{fwer}(\boldsymbol\phi,\mathbf{p}) - \eta)\mathbf 1(
 \mathrm{fwer}(\boldsymbol\phi,\mathbf{p}) - \eta) \right)}
-where \eqn{\eta\in[0,1]} is a threshold for imposing harder FWER penalty.
+where \eqn{\eta\in[0,1]} is a threshold for imposing harsher FWER penalty.
 }
 \examples{
 design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
@@ -41,6 +51,14 @@ u_2ewp(design,
                             n = 20,
                             weight_fun = baskexact::weights_fujikawa,
                             logbase = exp(1)),
-       xi1 = 1, xi2 = 2,
-       thresh = 0.1)
+       penalty1 = 1, penalty2 = 2,
+       threshold = 0.1)
+u_2pow(design,
+       x = list(lambda = 0.99, epsilon = 2, tau = 0.5),
+       detail_params = list(p1 = c(0.5, 0.2, 0.2),
+                            n = 20,
+                            weight_fun = baskexact::weights_fujikawa,
+                            logbase = exp(1)),
+       penalty1 = 1, penalty2 = 2,
+       threshold = 0.1)
 }

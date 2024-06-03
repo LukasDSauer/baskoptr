@@ -23,7 +23,7 @@
 #' The extreme borrowing cutoffs depend neither on `p0` nor on `p1`. They only
 #' depend on the number of baskets `k` and the number of patients per basket `n`.
 #'
-#' @inheritParams u_ewp_discont
+#' @inheritParams params_main
 #' @param epsilon The optimization parameter \eqn{\varepsilon} of Fujikawa's basket trial
 #' design.
 #' @param tau The optimization parameter \eqn{\tau} of Fujikawa's basket trial

@@ -20,7 +20,7 @@ opt_design_gen(
 \code{baskwrap::setup_fujikawa_x} or \code{basksim::setup_fujikawa}.}
 
 \item{utility}{A function returning the utility of a parameter combination
-\code{x}, of the form \code{utility(design, x, detail_params, ...)}, where \code{...} may
+\code{x} of the form \code{utility(design, x, detail_params, ...)}, where \code{...} may
 further parameters to be supplied to the utility.}
 
 \item{algorithm}{A function returning the optimization algorithm's results,
@@ -61,10 +61,10 @@ detail_params <- list(p1 = c(0.5, 0.2, 0.2),
                                     n = 20,
                                     weight_fun = baskexact::weights_fujikawa,
                                     logbase = exp(1))
-utility_params <- list(thresh = 0.05)
+utility_params <- list(penalty = 1, thresh = 0.1)
 # Bounded simulated annealing
 opt_design_gen(design = design,
-               utility = u_ewp_discont,
+               utility = u_ewp,
                algorithm = optimizr::simann,
                detail_params = detail_params,
                utility_params = utility_params,

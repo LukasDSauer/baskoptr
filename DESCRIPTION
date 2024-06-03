@@ -8,9 +8,10 @@ Authors@R:
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Imports:
-  optimizr,
-  nloptr,
   baskwrap
+Suggests:
+  optimizr,
+  baskexact
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1

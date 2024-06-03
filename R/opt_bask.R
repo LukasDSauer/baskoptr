@@ -3,17 +3,13 @@
 #' Optimize the parameters of a basket trial design using a utility-based
 #' approach with a simulation algorithm of your choice.
 #'
-#' @inheritParams u_ewp_discont
-#' @param utility A function returning the utility of a parameter combination
-#' `x`, of the form `utility(design, x, detail_params, ...)`, where `...` may
-#' further parameters to be supplied to the utility.
+#' @inheritParams params_main
+#' @inheritParams params_utility_caller
 #'
 #' @param algorithm A function returning the optimization algorithm's results,
 #' should have the form `algorithm(fn, ...)`, where `fn` is the
 #' function to be optimized and `...` may be further parameters of the
 #' optimization algorithm.
-#' @param utility_params A named list of further parameters that need to be
-#' supplied to  the utility function.
 #' @param algorithm_params A named list of further parameters that need to be
 #' supplied to the optimization algorithm.
 #' @param trace A logical, should the trace of the optimization algorithm be
@@ -36,10 +32,10 @@
 #'                                     n = 20,
 #'                                     weight_fun = baskexact::weights_fujikawa,
 #'                                     logbase = exp(1))
-#' utility_params <- list(thresh = 0.05)
+#' utility_params <- list(penalty = 1, thresh = 0.1)
 #' # Bounded simulated annealing
 #' opt_design_gen(design = design,
-#'                utility = u_ewp_discont,
+#'                utility = u_ewp,
 #'                algorithm = optimizr::simann,
 #'                detail_params = detail_params,
 #'                utility_params = utility_params,
