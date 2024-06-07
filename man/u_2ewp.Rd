@@ -5,9 +5,25 @@
 \alias{u_2pow}
 \title{Utility functions: Two-level power-error combination functions}
 \usage{
-u_2ewp(design, x, detail_params, penalty1, penalty2, threshold)
+u_2ewp(
+  design,
+  x,
+  detail_params,
+  penalty1,
+  penalty2,
+  threshold,
+  report_details = FALSE
+)
 
-u_2pow(design, x, detail_params, penalty1, penalty2, threshold)
+u_2pow(
+  design,
+  x,
+  detail_params,
+  penalty1,
+  penalty2,
+  threshold,
+  report_details = FALSE
+)
 }
 \arguments{
 \item{design}{An object of class \code{fujikawa} created by the function
