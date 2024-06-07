@@ -13,7 +13,8 @@ u_ewp(
   p1 = NULL,
   p2 = rep(design$p0, design$k),
   threshold,
-  penalty
+  penalty,
+  report_details = FALSE
 )
 
 u_ecd(
@@ -23,7 +24,8 @@ u_ecd(
   p1 = NULL,
   p2 = rep(design$p0, design$k),
   penalty,
-  threshold
+  threshold,
+  report_details = FALSE
 )
 }
 \arguments{

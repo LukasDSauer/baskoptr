@@ -11,7 +11,10 @@ u_avg(
   utility,
   utility_params,
   p1s,
-  weights_u = rep(1/nrow(p1s), nrow(p1s))
+  weights_u = rep(1/nrow(p1s), nrow(p1s)),
+  report_details = FALSE,
+  penalty_maxtoer = NULL,
+  threshold_maxtoer = NULL
 )
 }
 \arguments{
@@ -36,6 +39,13 @@ response rates under the alternative hypothesis.}
 
 \item{weights_u}{A numeric vector of weights for calculating the weighted
 average.}
+
+\item{penalty_maxtoer}{A numeric, the penalty for punishing the maximal TOER across
+all considered scenarios and all strata.}
+
+\item{threshold_maxtoer}{A numeric, above this threshold maximal TOER is punished
+by returning \code{-penalty_maxtoer} times the maximal TOER. Default is \code{NULL}, which
+means no penalty.}
 }
 \value{
 A numeric, the parameter combination's utility.
@@ -55,6 +65,7 @@ detail_params <- list(n = 20,
                       weight_fun = baskexact::weights_fujikawa,
                       logbase = exp(1))
 p1s <- rbind(c(0.2,0.2,0.2), c(0.2,0.2,0.5), c(0.2,0.5,0.5), c(0.5,0.5,0.5))
+# Averaging over u_ewp()
 u_avg(design,
       x = x,
       detail_params = detail_params,
@@ -62,11 +73,22 @@ u_avg(design,
       utility_params = list(penalty = 1, threshold = 0.1),
       p1s = p1s
       )
+# Averaging over u_2ewp()
+utility_params_2ewp <- list(penalty1 = 1, penalty2 = 2, threshold = 0.1)
 u_avg(design,
       x = x,
       detail_params = detail_params,
       utility = u_2ewp,
-      utility_params = list(penalty1 = 1, penalty2 = 2, threshold = 0.1),
+      utility_params = utility_params_2ewp,
       p1s = p1s
+      )
+# Punishing maximal TOER in all scenarios and all strata
+u_avg(design,
+      x = x,
+      detail_params = detail_params,
+      utility = u_2ewp,
+      utility_params = utility_params_2ewp,
+      p1s = p1s,
+      penalty_maxtoer = 1, threshold_maxtoer = 0.1
       )
 }

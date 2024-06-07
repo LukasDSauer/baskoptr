@@ -4,7 +4,16 @@
 \alias{u_bnd}
 \title{Utility function with boundaries on the parameters}
 \usage{
-u_bnd(design, x, detail_params, utility, utility_params, lower, upper)
+u_bnd(
+  design,
+  x,
+  detail_params,
+  utility,
+  utility_params,
+  lower,
+  upper,
+  report_details = FALSE
+)
 }
 \arguments{
 \item{design}{An object of class \code{fujikawa} created by the function
