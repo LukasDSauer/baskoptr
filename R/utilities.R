@@ -254,9 +254,11 @@ u_avg <- function(design, x, detail_params, utility, utility_params,
   utility_params["report_details"] <- (report_details |
                                          !is.null(threshold_maxtoer))
   u_fun <- function(p1){
+    detail_params_sc <- detail_params
+    detail_params$p1 <- p1
     do.call(utility, c(design = list(design),
                        x = list(x),
-                       detail_params = list(c(p1 = list(p1), detail_params)),
+                       detail_params = list(detail_params),
                        utility_params))}
   # Calculate utility for every scenario in the p1s
   u_vals <- apply(X = p1s, MARGIN = 1, FUN = u_fun, simplify = FALSE)
