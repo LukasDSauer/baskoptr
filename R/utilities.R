@@ -41,6 +41,7 @@
 u_ewp <- function(design, x, detail_params, p1 = NULL,
                   p2 = rep(design$p0, design$k), threshold, penalty,
                   report_details = FALSE) {
+  detail_params$which_details <- c(detail_params$which_details, "FWER", "EWP")
   details_list <- get_details_for_two_scenarios(design, x, detail_params, p1,
                                                 p2)
   u_result <- NA_real_
@@ -65,6 +66,8 @@ u_ecd <- function(design, x, detail_params, p1 = NULL,
                   p2 = rep(design$p0, design$k),
                   penalty, threshold,
                   report_details = FALSE) {
+  detail_params$which_details <- c(detail_params$which_details, "FWER", "ECD")
+
   details_list <- get_details_for_two_scenarios(design, x, detail_params, p1,
                                                 p2)
   u_result <- NA_real_
@@ -149,6 +152,7 @@ get_details_for_two_scenarios <- function(design, x, detail_params, p1, p2){
 #'        threshold = 0.1)
 u_2ewp <- function(design, x, detail_params, penalty1, penalty2, threshold,
                    report_details = FALSE) {
+  detail_params$which_details <- c(detail_params$which_details, "FWER", "EWP")
   details <- do.call(baskwrap::get_details,
                      c(design = list(design), as.list(x), detail_params))
   u_result <- NA_real_
@@ -170,6 +174,8 @@ u_2ewp <- function(design, x, detail_params, penalty1, penalty2, threshold,
 #' @export
 u_2pow <- function(design, x, detail_params, penalty1, penalty2, threshold,
                    report_details = FALSE) {
+  detail_params$which_details <- c(detail_params$which_details,
+                                   "Rejection_Probabilities")
   details <- do.call(baskwrap::get_details,
                      c(design = list(design), as.list(x), detail_params))
   alternative <- design$p0 != detail_params$p1
@@ -250,6 +256,8 @@ u_avg <- function(design, x, detail_params, utility, utility_params,
                   p1s, weights_u = rep(1/nrow(p1s), nrow(p1s)),
                   report_details = FALSE,
                   penalty_maxtoer = NULL, threshold_maxtoer = NULL){
+  detail_params$which_details <- c(detail_params$which_details,
+                                   "Rejection_Probabilities")
   u_result <- NA_real_
   utility_params["report_details"] <- (report_details |
                                          !is.null(threshold_maxtoer))
