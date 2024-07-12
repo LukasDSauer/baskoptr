@@ -4,7 +4,14 @@
 \alias{get_details_for_two_scenarios}
 \title{Internal helper function: Get details for two response scenarios}
 \usage{
-get_details_for_two_scenarios(design, x, detail_params, p1, p2)
+get_details_for_two_scenarios(
+  design,
+  x,
+  detail_params,
+  p1,
+  p2,
+  which_details_list
+)
 }
 \arguments{
 \item{design}{An object of class \code{fujikawa} created by the function
@@ -22,6 +29,10 @@ can also be left \code{NULL}, then the function goes looking in
 
 \item{p2}{A numeric, response scenario for calculating FWER, default is the
 global null scenario.}
+
+\item{which_details_list}{A list of two lists, \code{which_details_list[["p1"]]}
+and \code{which_details_list[["p2"]]}, containing the details which are to
+be requested for \code{p1} and \code{p2}, respectively.}
 }
 \value{
 A list of two lists containing return values of \code{get_details} calls.

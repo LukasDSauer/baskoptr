@@ -41,9 +41,10 @@
 u_ewp <- function(design, x, detail_params, p1 = NULL,
                   p2 = rep(design$p0, design$k), threshold, penalty,
                   report_details = FALSE) {
-  detail_params$which_details <- c(detail_params$which_details, "FWER", "EWP")
   details_list <- get_details_for_two_scenarios(design, x, detail_params, p1,
-                                                p2)
+                                                p2, which_details_list =
+                                                      list(p1 = list("EWP"),
+                                                           p2 = list("FWER")))
   u_result <- NA_real_
   ewp <-
     details_list[["p1"]]$EWP
@@ -66,10 +67,12 @@ u_ecd <- function(design, x, detail_params, p1 = NULL,
                   p2 = rep(design$p0, design$k),
                   penalty, threshold,
                   report_details = FALSE) {
-  detail_params$which_details <- c(detail_params$which_details, "FWER", "ECD")
 
   details_list <- get_details_for_two_scenarios(design, x, detail_params, p1,
-                                                p2)
+                                                p2,
+                                                which_details_list =
+                                                  list(p1 = "ECD",
+                                                       p2 = "FWER"))
   u_result <- NA_real_
   ecd <-
     details_list[["p1"]]$ECD
@@ -89,8 +92,12 @@ u_ecd <- function(design, x, detail_params, p1 = NULL,
 #' Internal helper function: Get details for two response scenarios
 #'
 #' @inheritParams u_ewp
+#' @param which_details_list  A list of two lists, `which_details_list[["p1"]]`
+#' and `which_details_list[["p2"]]`, containing the details which are to
+#' be requested for `p1` and `p2`, respectively.
 #' @return A list of two lists containing return values of `get_details` calls.
-get_details_for_two_scenarios <- function(design, x, detail_params, p1, p2){
+get_details_for_two_scenarios <- function(design, x, detail_params, p1, p2,
+                                          which_details_list){
   # Calculate details under p1
   if(!is.null(p1)){
     detail_params$p1 <- p1
@@ -98,14 +105,35 @@ get_details_for_two_scenarios <- function(design, x, detail_params, p1, p2){
     stop("You must supply either p1 or detail_params$p1!")
   }
   details_p1 <- do.call(baskwrap::get_details,
-                      c(design = list(design), as.list(x), detail_params))
+                      c(design = list(design),
+                        as.list(x),
+                        append_which_detail_params(detail_params,
+                                                     further =
+                                                       which_details_list[["p1"]])))
 
   # Calculate details under p2
   detail_params$p1 <- p2
   details_p2 <- do.call(baskwrap::get_details,
-                      c(design = list(design), as.list(x), detail_params))
+                      c(design = list(design),
+                        as.list(x),
+                        append_which_detail_params(detail_params,
+                                                     further =
+                                                       which_details_list[["p2"]])))
   return(list(p1 = details_p1,
               p2 = details_p2))
+}
+#' Internal helper function: Append which_details list in the detail_params list
+#'
+#' Takes the argument `detail_params$which_details` and appends it with the
+#' list `further`.
+#'
+#' @inheritParams u_ewp
+#' @param further  A list of further params.
+#' @return The updated list of `detail_params`.
+append_which_detail_params <- function(detail_params, further){
+  detail_params$which_details <- c(detail_params$which_details,
+                                   further)
+  return(detail_params)
 }
 
 #' Utility functions: Two-level power-error combination functions
