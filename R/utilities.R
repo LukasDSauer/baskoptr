@@ -41,19 +41,41 @@
 u_ewp <- function(design, x, detail_params, p1 = NULL,
                   p2 = rep(design$p0, design$k), threshold, penalty,
                   report_details = FALSE) {
-  details_list <- get_details_for_two_scenarios(design, x, detail_params, p1,
-                                                p2, which_details_list =
-                                                      list(p1 = list("EWP"),
-                                                           p2 = list("FWER")))
   u_result <- NA_real_
-  ewp <-
-    details_list[["p1"]]$EWP
-  fwer <-
-    details_list[["p2"]]$FWER
-  if (fwer >= threshold) {
-    u_result <- -fwer*penalty
-  } else{
-    u_result <- ewp
+  if(design$backend == "sim"){
+    details_list <- get_details_for_two_scenarios(design, x, detail_params, p1,
+                                                  p2, which_details_list =
+                                                    list(p1 = list("EWP"),
+                                                         p2 = list("FWER")))
+
+    ewp <-
+      details_list[["p1"]]$EWP
+    fwer <-
+      details_list[["p2"]]$FWER
+    if (fwer >= threshold) {
+      u_result <- -fwer*penalty
+    } else{
+      u_result <- ewp
+    }
+  } else if(design$backend == "exact"){
+    details <- do.call(baskwrap::get_details,
+                       c(design = list(design),
+                         as.list(x),
+                         append_details(set_details(detail_params, "p1", p2),
+                                        "which_details", "FWER")))
+    fwer <-
+      details$FWER
+    if (fwer >= threshold) {
+      u_result <- -fwer*penalty
+    } else{
+      detail_params <- io_val_p1(detail_params, p1)
+      details <- do.call(baskwrap::get_details,
+                         c(design = list(design),
+                           as.list(x),
+                           append_details(detail_params, "which_details",
+                                          "EWP")))
+      u_result <- details$EWP
+    }
   }
   if(report_details){
     attr(u_result, "details") <- details_list
@@ -67,21 +89,41 @@ u_ecd <- function(design, x, detail_params, p1 = NULL,
                   p2 = rep(design$p0, design$k),
                   penalty, threshold,
                   report_details = FALSE) {
-
-  details_list <- get_details_for_two_scenarios(design, x, detail_params, p1,
-                                                p2,
-                                                which_details_list =
-                                                  list(p1 = "ECD",
-                                                       p2 = "FWER"))
   u_result <- NA_real_
-  ecd <-
-    details_list[["p1"]]$ECD
-  fwer <-
-    details_list[["p2"]]$FWER
-  if (fwer >= threshold) {
-    u_result <- -fwer*penalty
-  } else{
-    u_result <- ecd
+  if(design$backend == "sim"){
+    details_list <- get_details_for_two_scenarios(design, x, detail_params, p1,
+                                                  p2,
+                                                  which_details_list =
+                                                    list(p1 = "ECD",
+                                                         p2 = "FWER"))
+    ecd <-
+      details_list[["p1"]]$ECD
+    fwer <-
+      details_list[["p2"]]$FWER
+    if (fwer >= threshold) {
+      u_result <- -fwer*penalty
+    } else{
+      u_result <- ecd
+    }
+  } else if(design$backend == "exact"){
+    details <- do.call(baskwrap::get_details,
+                       c(design = list(design),
+                         as.list(x),
+                         append_details(set_details(detail_params, "p1", p2),
+                                        "which_details", "FWER")))
+    fwer <-
+      details$FWER
+    if (fwer >= threshold) {
+      u_result <- -fwer*penalty
+    } else{
+      detail_params <- io_val_p1(detail_params, p1)
+      details <- do.call(baskwrap::get_details,
+                         c(design = list(design),
+                           as.list(x),
+                           append_details(detail_params, "which_details",
+                                          "ECD")))
+      u_result <- details$ECD
+    }
   }
   if(report_details){
     attr(u_result, "details") <- details_list
@@ -98,42 +140,22 @@ u_ecd <- function(design, x, detail_params, p1 = NULL,
 #' @return A list of two lists containing return values of `get_details` calls.
 get_details_for_two_scenarios <- function(design, x, detail_params, p1, p2,
                                           which_details_list){
-  # Calculate details under p1
-  if(!is.null(p1)){
-    detail_params$p1 <- p1
-  } else if(is.null(detail_params$p1)){
-    stop("You must supply either p1 or detail_params$p1!")
-  }
+  details_params <- io_val_p1(detail_params, p1)
   details_p1 <- do.call(baskwrap::get_details,
                       c(design = list(design),
                         as.list(x),
-                        append_which_detail_params(detail_params,
-                                                     further =
-                                                       which_details_list[["p1"]])))
+                        append_details(detail_params, "which_details",
+                                       further = which_details_list[["p1"]])))
 
   # Calculate details under p2
   detail_params$p1 <- p2
   details_p2 <- do.call(baskwrap::get_details,
                       c(design = list(design),
                         as.list(x),
-                        append_which_detail_params(detail_params,
-                                                     further =
-                                                       which_details_list[["p2"]])))
+                        append_details(detail_params,  "which_details",
+                                       further = which_details_list[["p2"]])))
   return(list(p1 = details_p1,
               p2 = details_p2))
-}
-#' Internal helper function: Append which_details list in the detail_params list
-#'
-#' Takes the argument `detail_params$which_details` and appends it with the
-#' list `further`.
-#'
-#' @inheritParams u_ewp
-#' @param further  A list of further params.
-#' @return The updated list of `detail_params`.
-append_which_detail_params <- function(detail_params, further){
-  detail_params$which_details <- c(detail_params$which_details,
-                                   further)
-  return(detail_params)
 }
 
 #' Utility functions: Two-level power-error combination functions
@@ -394,3 +416,43 @@ u_bnd <-
                                 report_details = FALSE)))
     }
   }
+
+#' Internal helper function: Append and set elements of a details list
+#'
+#' `append_details` takes the element `details[["index"]]` and appends it with
+#' the list `further`. `set_details` takes the element `details[["index"]]` and
+#' sets it to `value`.
+#'
+#' @inheritParams u_ewp
+#' @param further  A list of further parameters to be appended.
+#' @param value  Any value that can be a list element.
+#' @return The updated list of `details`.
+append_details <- function(details, index, further){
+  details[[index]] <- c(details[[index]], further)
+  return(details)
+}
+#' @rdname append_details
+set_details <- function(details, index, value){
+  details[[index]] <- value
+  return(details)
+}
+
+
+#' Internal helper function: Input validation for p1
+#'
+#' Returns `detail_params` with checked element `details_params$p1 <- p1`,
+#' depending on whether `p1` is not `NULL` or `detail_params$p1` is not `NULL`.
+#' Returns an error message if both are NULL.
+#'
+#' @inheritParams u_ewp
+#'
+#' @return The updated list of `detail_params`.
+io_val_p1 <- function(detail_params, p1){
+  # Calculate details under p1
+  if(!is.null(p1)){
+    detail_params$p1 <- p1
+  } else if(is.null(detail_params$p1)){
+    stop("You must supply either p1 or detail_params$p1!")
+  }
+  return(detail_params)
+}
