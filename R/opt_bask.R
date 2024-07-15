@@ -53,7 +53,7 @@
 #'                                                       fnscale = -1)))
 opt_design_gen <- function(design, utility, algorithm, detail_params,
                            utility_params, algorithm_params, trace = TRUE,
-                           x_names = NULL){
+                           x_names = NULL, fn_name = "fn"){
   if(is.null(x_names)){
     if(!is.null(algorithm_params$lower)){
       x_names <- names(algorithm_params$lower)
@@ -72,9 +72,10 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
                        x = list(x_named),
                        detail_params = list(detail_params),
                        utility_params))}
-  res <- do.call(algorithm,
-                 c(fn = u_fun,
-                   algorithm_params))
+  args <- c(fn = u_fun,
+            algorithm_params)
+  names(args)[[1]] <- fn_name
+  res <- do.call(algorithm, args)
   return(res)
 }
 
