@@ -12,7 +12,8 @@ opt_design_gen(
   utility_params,
   algorithm_params,
   trace = TRUE,
-  x_names = NULL
+  x_names = NULL,
+  fn_name = "fn"
 )
 }
 \arguments{
@@ -40,9 +41,12 @@ supplied to the optimization algorithm.}
 \item{trace}{A logical, should the trace of the optimization algorithm be
 returned?}
 
-\item{x_names}{character vector containing the names of the utility functions
+\item{x_names}{Acharacter vector containing the names of the utility functions
 tuning parameters, automatically retrieved from \code{algorithm_params$par} or
 \code{algorithm_params$lower} if either is present. Default is \code{NULL}.}
+
+\item{fn_name}{The name of the function argument of \code{algorithm}. The
+default is \code{"fn"}.}
 }
 \value{
 a list consisting of the optimal parameter vector, the resulting

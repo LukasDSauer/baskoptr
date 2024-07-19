@@ -14,9 +14,11 @@
 #' supplied to the optimization algorithm.
 #' @param trace A logical, should the trace of the optimization algorithm be
 #' returned?
-#' @param x_names character vector containing the names of the utility functions
+#' @param x_names A character vector containing the names of the utility functions
 #' tuning parameters, automatically retrieved from `algorithm_params$par` or
 #' `algorithm_params$lower` if either is present. Default is `NULL`.
+#' @param fn_name The name of the function argument of `algorithm`. The
+#' default is `"fn"`.
 #'
 #' @return a list consisting of the optimal parameter vector, the resulting
 #' optimal utility value, and the trace of the optimization algorithm.
@@ -68,6 +70,7 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
   u_fun <- function(x){
     x_named <- x
     names(x_named) <- x_names
+    print(x_named)
     do.call(utility, c(design = list(design),
                        x = list(x_named),
                        detail_params = list(detail_params),
