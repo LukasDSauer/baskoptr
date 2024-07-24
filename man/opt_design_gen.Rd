@@ -41,7 +41,7 @@ supplied to the optimization algorithm.}
 \item{trace}{A logical, should the trace of the optimization algorithm be
 returned?}
 
-\item{x_names}{Acharacter vector containing the names of the utility functions
+\item{x_names}{A character vector containing the names of the utility functions
 tuning parameters, automatically retrieved from \code{algorithm_params$par} or
 \code{algorithm_params$lower} if either is present. Default is \code{NULL}.}
 

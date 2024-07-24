@@ -264,6 +264,10 @@ u_2pow <- function(design, x, detail_params, penalty1, penalty2, threshold,
 #' @param threshold_maxtoer A numeric, above this threshold maximal TOER is punished
 #' by returning `-penalty_maxtoer` times the maximal TOER. Default is `NULL`, which
 #' means no penalty.
+#' @param use_future A logical, should `future_apply()` instead of `apply()`
+#' be used for calculating the utilities to be averaged over. You must still
+#' activate a *future* backend for this option to take any effect, default is
+#' `FALSE`.
 #'
 #' @inherit u_ewp return
 #' @export
@@ -305,7 +309,8 @@ u_2pow <- function(design, x, detail_params, penalty1, penalty2, threshold,
 u_avg <- function(design, x, detail_params, utility, utility_params,
                   p1s, weights_u = rep(1/nrow(p1s), nrow(p1s)),
                   report_details = FALSE,
-                  penalty_maxtoer = NULL, threshold_maxtoer = NULL){
+                  penalty_maxtoer = NULL, threshold_maxtoer = NULL,
+                  use_future = FALSE){
   detail_params$which_details <- c(detail_params$which_details,
                                    "Rejection_Probabilities")
   u_result <- NA_real_
@@ -319,7 +324,11 @@ u_avg <- function(design, x, detail_params, utility, utility_params,
                        detail_params = list(detail_params),
                        utility_params))}
   # Calculate utility for every scenario in the p1s
-  u_vals <- apply(X = p1s, MARGIN = 1, FUN = u_fun, simplify = FALSE)
+  if(!future_apply){
+    u_vals <- apply(X = p1s, MARGIN = 1, FUN = u_fun, simplify = FALSE)
+  } else{
+    u_vals <- future_apply(X = p1s, MARGIN = 1, FUN = u_fun, simplify = FALSE)
+  }
   # Resulting utility is the weighted mean of utilities
   u_result <- sum(as.numeric(u_vals)*weights_u)
   # Punish maximal TOER rate in strata if requested, maximum is formed

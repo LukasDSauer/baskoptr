@@ -14,7 +14,8 @@ u_avg(
   weights_u = rep(1/nrow(p1s), nrow(p1s)),
   report_details = FALSE,
   penalty_maxtoer = NULL,
-  threshold_maxtoer = NULL
+  threshold_maxtoer = NULL,
+  use_future = FALSE
 )
 }
 \arguments{
@@ -46,6 +47,10 @@ all considered scenarios and all strata.}
 \item{threshold_maxtoer}{A numeric, above this threshold maximal TOER is punished
 by returning \code{-penalty_maxtoer} times the maximal TOER. Default is \code{NULL}, which
 means no penalty.}
+
+\item{use_future}{A logical, should \code{future_apply()} and colleagues instead
+of \code{apply()} and co. be used. You must still activate a \emph{future}  backend for
+this option to take any effect.}
 }
 \value{
 A numeric, the parameter combination's utility.

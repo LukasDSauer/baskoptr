@@ -70,7 +70,6 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
   u_fun <- function(x){
     x_named <- x
     names(x_named) <- x_names
-    print(x_named)
     do.call(utility, c(design = list(design),
                        x = list(x_named),
                        detail_params = list(detail_params),
