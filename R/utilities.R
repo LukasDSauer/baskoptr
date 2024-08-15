@@ -324,7 +324,7 @@ u_avg <- function(design, x, detail_params, utility, utility_params,
                        detail_params = list(detail_params),
                        utility_params))}
   # Calculate utility for every scenario in the p1s
-  if(!future_apply){
+  if(!use_future){
     u_vals <- apply(X = p1s, MARGIN = 1, FUN = u_fun, simplify = FALSE)
   } else{
     u_vals <- future_apply(X = p1s, MARGIN = 1, FUN = u_fun, simplify = FALSE)
