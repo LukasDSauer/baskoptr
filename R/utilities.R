@@ -325,10 +325,10 @@ u_avg <- function(design, x, detail_params, utility, utility_params,
                        utility_params))}
   # Calculate utility for every scenario in the p1s
   if(!use_future){
-    message("Use of future_apply in u_avg() is switched off.")
+    # message("Use of future_apply in u_avg() is switched off.")
     u_vals <- apply(X = p1s, MARGIN = 1, FUN = u_fun, simplify = FALSE)
   } else{
-    message("Use of future_apply in u_avg() is switched on.")
+    # message("Use of future_apply in u_avg() is switched on.")
     u_vals <- future.apply::future_apply(X = p1s, MARGIN = 1, FUN = u_fun,
                                          simplify = FALSE, future.seed=TRUE)
   }
