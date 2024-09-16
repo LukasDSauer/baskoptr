@@ -48,9 +48,10 @@ all considered scenarios and all strata.}
 by returning \code{-penalty_maxtoer} times the maximal TOER. Default is \code{NULL}, which
 means no penalty.}
 
-\item{use_future}{A logical, should \code{future_apply()} and colleagues instead
-of \code{apply()} and co. be used. You must still activate a \emph{future}  backend for
-this option to take any effect.}
+\item{use_future}{A logical, should \code{future_apply()} instead of \code{apply()}
+be used for calculating the utilities to be averaged over. You must still
+activate a \emph{future} backend for this option to take any effect, default is
+\code{FALSE}.}
 }
 \value{
 A numeric, the parameter combination's utility.

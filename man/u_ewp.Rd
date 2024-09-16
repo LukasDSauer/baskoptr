@@ -14,7 +14,8 @@ u_ewp(
   p2 = rep(design$p0, design$k),
   threshold,
   penalty,
-  report_details = FALSE
+  report_details = FALSE,
+  reduce_calculations = ifelse(design$backend == "exact", TRUE, FALSE)
 )
 
 u_ecd(
@@ -25,7 +26,8 @@ u_ecd(
   p2 = rep(design$p0, design$k),
   penalty,
   threshold,
-  report_details = FALSE
+  report_details = FALSE,
+  reduce_calculations = ifelse(design$backend == "exact", TRUE, FALSE)
 )
 }
 \arguments{
@@ -49,13 +51,31 @@ global null scenario.}
 penalty, default: 0.1.}
 
 \item{penalty}{A numeric, the scaling factor for FWER penalty, default: 1.}
+
+\item{reduce_calculations}{A logical, only takes effect for the
+\code{"exact"} backend. If \code{TRUE}, the function will only execute the
+\code{get_details()} function for \code{p1} if the FWER for \code{p2} turned out
+to be low enough. This may speed up function execution.
+Default is \code{TRUE} for the \code{"exact"} backend and \code{FALSE} otherwise.}
 }
 \value{
 A numeric, the parameter combination's utility.
 }
 \description{
-Utility functions: Discontinuous power/ECD functions with type-I error
-penalty
+These utility functions return experiment-wise power (EWP) or expected number
+of
+correct decisions (ECD) if the family-wise error rate (FWER) is low and the
+negative FWER multiplied by a penalty parameter if the FWER is high.
+}
+\details{
+The utility functions are
+defined as
+\deqn{u_{\text{ewp}}(x,\mathbf{p_1},\mathbf{p_2})=\mathrm{ewp}
+(x,\mathbf{p_1}),}
+if the FWER fulfills \eqn{\mathrm{fwer}(x,\mathbf{p_2}) < \eta_1}, and
+\deqn{u_{\text{ewp}}(x,\mathbf{p_1},\mathbf{p_2})=
+-\xi_1\cdot\mathrm{fwer}(x,\mathbf{p_2}),}
+if \eqn{\mathrm{fwer}(x,\mathbf{p_2}) \geq \eta_1}.
 }
 \examples{
 # Calculating the EWP utility using basksim as a backend

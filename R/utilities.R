@@ -1,6 +1,20 @@
 #' Utility functions: Discontinuous power/ECD functions with type-I error
 #' penalty
 #'
+#' These utility functions return experiment-wise power (EWP) or expected number
+#' of
+#' correct decisions (ECD) if the family-wise error rate (FWER) is low and the
+#' negative FWER multiplied by a penalty parameter if the FWER is high.
+#'
+#' The utility functions are
+#' defined as
+#' \deqn{u_{\text{ewp}}(x,\mathbf{p_1},\mathbf{p_2})=\mathrm{ewp}
+#' (x,\mathbf{p_1}),}
+#' if the FWER fulfills \eqn{\mathrm{fwer}(x,\mathbf{p_2}) < \eta_1}, and
+#' \deqn{u_{\text{ewp}}(x,\mathbf{p_1},\mathbf{p_2})=
+#' -\xi_1\cdot\mathrm{fwer}(x,\mathbf{p_2}),}
+#' if \eqn{\mathrm{fwer}(x,\mathbf{p_2}) \geq \eta_1}.
+#'
 #' @inheritParams params_main
 #' @param x  A named list, the design's tuning parameters to be optimized.
 #' @param detail_params A named list of parameters that need to be supplied to
@@ -14,6 +28,11 @@
 #' @param threshold A numeric, for high FWER above this threshold we impose a
 #' penalty, default: 0.1.
 #' @param penalty A numeric, the scaling factor for FWER penalty, default: 1.
+#' @param reduce_calculations A logical, only takes effect for the
+#' `"exact"` backend. If `TRUE`, the function will only execute the
+#' `get_details()` function for `p1` if the FWER for `p2` turned out
+#' to be low enough. This may speed up function execution.
+#' Default is `TRUE` for the `"exact"` backend and `FALSE` otherwise.
 #'
 #' @return A numeric, the parameter combination's utility.
 #' @export
@@ -40,9 +59,15 @@
 #'       penalty = 1, threshold = 0.1)
 u_ewp <- function(design, x, detail_params, p1 = NULL,
                   p2 = rep(design$p0, design$k), threshold, penalty,
-                  report_details = FALSE) {
+                  report_details = FALSE,
+                  reduce_calculations =
+                    ifelse(design$backend == "exact", TRUE, FALSE)) {
   u_result <- NA_real_
-  if(design$backend == "sim"){
+  if(!reduce_calculations | design$backend == "sim"){
+    if(reduce_calculations){
+      message('The argument reduce_calculations = TRUE takes no effect for
+              the designs with backend = "sim".')
+    }
     details_list <- get_details_for_two_scenarios(design, x, detail_params, p1,
                                                   p2, which_details_list =
                                                     list(p1 = list("EWP"),
@@ -58,27 +83,29 @@ u_ewp <- function(design, x, detail_params, p1 = NULL,
       u_result <- ewp
     }
   } else if(design$backend == "exact"){
-    details <- do.call(baskwrap::get_details,
+    details_list <- list()
+    details_list[["p2"]] <- do.call(baskwrap::get_details,
                        c(design = list(design),
                          as.list(x),
                          append_details(set_details(detail_params, "p1", p2),
                                         "which_details", "FWER")))
     fwer <-
-      details$FWER
+      details_list[["p2"]]$FWER
     if (fwer >= threshold) {
       u_result <- -fwer*penalty
     } else{
       detail_params <- io_val_p1(detail_params, p1)
-      details <- do.call(baskwrap::get_details,
+      details_list[["p1"]] <- do.call(baskwrap::get_details,
                          c(design = list(design),
                            as.list(x),
                            append_details(detail_params, "which_details",
                                           "EWP")))
-      u_result <- details$EWP
+      u_result <- details_list[["p1"]]$EWP
     }
   }
   if(report_details){
     attr(u_result, "details") <- details_list
+    attr(u_result, "reduce_calculations") <- reduce_calculations
   }
   return(u_result)
 }
@@ -88,9 +115,15 @@ u_ewp <- function(design, x, detail_params, p1 = NULL,
 u_ecd <- function(design, x, detail_params, p1 = NULL,
                   p2 = rep(design$p0, design$k),
                   penalty, threshold,
-                  report_details = FALSE) {
+                  report_details = FALSE,
+                  reduce_calculations =
+                    ifelse(design$backend == "exact", TRUE, FALSE)) {
   u_result <- NA_real_
-  if(design$backend == "sim"){
+  if(!reduce_calculations | design$backend == "sim"){
+    if(reduce_calculations){
+      message('The argument reduce_calculations = TRUE takes no effect for
+              the designs with backend = "sim".')
+    }
     details_list <- get_details_for_two_scenarios(design, x, detail_params, p1,
                                                   p2,
                                                   which_details_list =
@@ -106,27 +139,29 @@ u_ecd <- function(design, x, detail_params, p1 = NULL,
       u_result <- ecd
     }
   } else if(design$backend == "exact"){
-    details <- do.call(baskwrap::get_details,
+    details_list <- list()
+    details_list[["p2"]] <- do.call(baskwrap::get_details,
                        c(design = list(design),
                          as.list(x),
                          append_details(set_details(detail_params, "p1", p2),
                                         "which_details", "FWER")))
     fwer <-
-      details$FWER
+      details_list[["p2"]]$FWER
     if (fwer >= threshold) {
       u_result <- -fwer*penalty
     } else{
       detail_params <- io_val_p1(detail_params, p1)
-      details <- do.call(baskwrap::get_details,
+      details_list[["p1"]] <- do.call(baskwrap::get_details,
                          c(design = list(design),
                            as.list(x),
                            append_details(detail_params, "which_details",
                                           "ECD")))
-      u_result <- details$ECD
+      u_result <- details_list[["p1"]]$ECD
     }
   }
   if(report_details){
     attr(u_result, "details") <- details_list
+    attr(u_result, "reduce_calculations") <- reduce_calculations
   }
   return(u_result)
 }
@@ -337,6 +372,15 @@ u_avg <- function(design, x, detail_params, utility, utility_params,
   # Punish maximal TOER rate in strata if requested, maximum is formed
   # across all scenarios and all strata
   if(!is.null(threshold_maxtoer)){
+    if(!is.null(attr(u_vals[[1]], "reduce_calculations"))){
+      if(attr(u_vals[[1]], "reduce_calculations")) stop(
+"It appears that you are trying to calculate maximal stratum-wise rejection
+  probabilities for u_ewp() or u_avg() with the option
+  utility_params$reduce_calculations == TRUE.
+  This may yield incorrect results. Please switch the utility function's
+  parameter to
+  utility_params$reduce_calculations <- FALSE.")
+    }
     toers <- lapply(u_vals,
            function(x){
              n <- names(attr(x, "details"))
