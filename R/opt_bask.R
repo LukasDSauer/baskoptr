@@ -12,16 +12,26 @@
 #' optimization algorithm.
 #' @param algorithm_params A named list of further parameters that need to be
 #' supplied to the optimization algorithm.
-#' @param trace A logical, should the trace of the optimization algorithm be
-#' returned?
+#' @param trace A logical or a character string, should the trace of the
+#' optimization algorithm be recorded? Default is `FALSE`. If `TRUE`, recording
+#' is done by dynamic appending of a data frame (which may not be
+#' very efficient). If `trace` is a character vector specifying a file path,
+#' the trace will be dynamically saved to an RDS file.
+#' Some optimization algorithms automatically return their
+#' trace. In that case, you can switch off using `trace = FALSE` (or `""` or
+#' `NULL`) and request the trace directly from your algorithm using
+#' `algorith_params`.
 #' @param x_names A character vector containing the names of the utility functions
 #' tuning parameters, automatically retrieved from `algorithm_params$par` or
 #' `algorithm_params$lower` if either is present. Default is `NULL`.
 #' @param fn_name The name of the function argument of `algorithm`. The
 #' default is `"fn"`.
 #'
-#' @return a list consisting of the optimal parameter vector, the resulting
-#' optimal utility value, and the trace of the optimization algorithm.
+#' @return a list consisting of the algorithm's output (usually the optimal
+#' parameter vector and the resulting optimal utility value and some meta
+#' information). If `trace == TRUE`, the trace of the optimization algorithm
+#' can be found in the `[["trace"]]` argument of the list. (This overwrites
+#' any `[["trace"]]` argument in the algorithm's output.)
 #'
 #' @export
 #'
@@ -54,7 +64,7 @@
 #'                                                       temp = 10,
 #'                                                       fnscale = -1)))
 opt_design_gen <- function(design, utility, algorithm, detail_params,
-                           utility_params, algorithm_params, trace = TRUE,
+                           utility_params, algorithm_params, trace = FALSE,
                            x_names = NULL, fn_name = "fn"){
   if(is.null(x_names)){
     if(!is.null(algorithm_params$lower)){
@@ -67,17 +77,62 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
           algorithm_params$par or algorithm_params$lower.")
     }
   }
-  u_fun <- function(x){
-    x_named <- x
-    names(x_named) <- x_names
-    do.call(utility, c(design = list(design),
-                       x = list(x_named),
-                       detail_params = list(detail_params),
-                       utility_params))}
+  alg_trace <- data.frame()
+  u_fun <- NULL
+  trace_rec <- NULL
+  # Should the trace be recorded and/or saved to a file?
+  if(is.null(trace)){
+    trace_rec <- "none"
+  } else if(is.logical(trace)){
+    trace_rec <- ifelse(trace, "return", "none")
+  } else if(is.character(trace)){
+    trace_rec <- ifelse(trace == "", "none", "return and save")
+  }
+  if(trace_rec == "return and save"){
+    connection <- file(trace)
+  }
+  if(trace_rec == "none"){
+    u_fun <- function(x){
+      x_named <- x
+      names(x_named) <- x_names
+      return(do.call(utility, c(design = list(design),
+                         x = list(x_named),
+                         detail_params = list(detail_params),
+                         utility_params)))}
+  } else if(trace_rec == "return"){
+    u_fun <- function(x){
+      x_named <- x
+      names(x_named) <- x_names
+      fn <- do.call(utility, c(design = list(design),
+                         x = list(x_named),
+                         detail_params = list(detail_params),
+                         utility_params))
+      alg_trace <- cbind(alg_trace, rbind(x_named, fn))
+      return(fn)
+      }
+
+  } else if(trace_rec == "return and save"){
+    u_fun <- function(x){
+      x_named <- x
+      names(x_named) <- x_names
+      fn <- do.call(utility, c(design = list(design),
+                               x = list(x_named),
+                               detail_params = list(detail_params),
+                               utility_params))
+      alg_trace <- cbind(alg_trace, rbind(x_named, fn))
+      open(connection)
+      saveRDS(alg_trace, con)
+      close(connection)
+      return(fn)
+    }
+  }
   args <- c(fn = u_fun,
             algorithm_params)
   names(args)[[1]] <- fn_name
   res <- do.call(algorithm, args)
+  if(trace){
+    res[["trace"]] <- alg_trace
+  }
   return(res)
 }
 
