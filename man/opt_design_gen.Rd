@@ -11,7 +11,7 @@ opt_design_gen(
   detail_params,
   utility_params,
   algorithm_params,
-  trace = TRUE,
+  trace = FALSE,
   x_names = NULL,
   fn_name = "fn"
 )
@@ -38,8 +38,15 @@ supplied to  the utility function.}
 \item{algorithm_params}{A named list of further parameters that need to be
 supplied to the optimization algorithm.}
 
-\item{trace}{A logical, should the trace of the optimization algorithm be
-returned?}
+\item{trace}{A logical or a character string, should the trace of the
+optimization algorithm be recorded? Default is \code{FALSE}. If \code{TRUE}, recording
+is done by dynamic appending of a data frame (which may not be
+very efficient). If \code{trace} is a character vector specifying a file path,
+the trace will be dynamically saved to an RDS file.
+Some optimization algorithms automatically return their
+trace. In that case, you can switch off using \code{trace = FALSE} (or \code{""} or
+\code{NULL}) and request the trace directly from your algorithm using
+\code{algorith_params}.}
 
 \item{x_names}{A character vector containing the names of the utility functions
 tuning parameters, automatically retrieved from \code{algorithm_params$par} or
@@ -49,8 +56,11 @@ tuning parameters, automatically retrieved from \code{algorithm_params$par} or
 default is \code{"fn"}.}
 }
 \value{
-a list consisting of the optimal parameter vector, the resulting
-optimal utility value, and the trace of the optimization algorithm.
+a list consisting of the algorithm's output (usually the optimal
+parameter vector and the resulting optimal utility value and some meta
+information). If \code{trace == TRUE}, the trace of the optimization algorithm
+can be found in the \verb{[["trace"]]} argument of the list. (This overwrites
+any \verb{[["trace"]]} argument in the algorithm's output.)
 }
 \description{
 Optimize the parameters of a basket trial design using a utility-based

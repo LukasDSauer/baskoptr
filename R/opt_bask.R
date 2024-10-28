@@ -77,19 +77,19 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
           algorithm_params$par or algorithm_params$lower.")
     }
   }
-  alg_trace <- data.frame()
   u_fun <- NULL
   trace_rec <- NULL
+  connection <- NULL
   # Should the trace be recorded and/or saved to a file?
   if(is.null(trace)){
     trace_rec <- "none"
   } else if(is.logical(trace)){
     trace_rec <- ifelse(trace, "return", "none")
+    trace_path <- "trace_tmp.RDS"
   } else if(is.character(trace)){
     trace_rec <- ifelse(trace == "", "none", "return and save")
-  }
-  if(trace_rec == "return and save"){
-    connection <- file(trace)
+    trace_path <- trace
+    trace <- TRUE
   }
   if(trace_rec == "none"){
     u_fun <- function(x){
@@ -99,19 +99,11 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
                          x = list(x_named),
                          detail_params = list(detail_params),
                          utility_params)))}
-  } else if(trace_rec == "return"){
-    u_fun <- function(x){
-      x_named <- x
-      names(x_named) <- x_names
-      fn <- do.call(utility, c(design = list(design),
-                         x = list(x_named),
-                         detail_params = list(detail_params),
-                         utility_params))
-      alg_trace <- cbind(alg_trace, rbind(x_named, fn))
-      return(fn)
-      }
-
-  } else if(trace_rec == "return and save"){
+  } else if(trace_rec == "return" | trace_rec == "return and save"){
+    connection <- file(trace_path)
+    open(connection)
+    saveRDS(NULL, connection)
+    close(connection)
     u_fun <- function(x){
       x_named <- x
       names(x_named) <- x_names
@@ -119,9 +111,12 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
                                x = list(x_named),
                                detail_params = list(detail_params),
                                utility_params))
-      alg_trace <- cbind(alg_trace, rbind(x_named, fn))
+      browser()
+      alg_trace <- readRDS(connection)
+      assign("alg_trace", rbind(alg_trace, cbind(t(x_named), fn)),
+             envir = parent.frame())
       open(connection)
-      saveRDS(alg_trace, con)
+      saveRDS(alg_trace, connection)
       close(connection)
       return(fn)
     }
@@ -131,7 +126,10 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
   names(args)[[1]] <- fn_name
   res <- do.call(algorithm, args)
   if(trace){
-    res[["trace"]] <- alg_trace
+    res[["trace"]] <- readRDS(connection)
+  }
+  if(trace_rec == "return"){
+    # TODO delete the tmp trace file
   }
   return(res)
 }
