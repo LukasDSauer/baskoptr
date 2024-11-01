@@ -12,6 +12,11 @@
 #' optimization algorithm.
 #' @param algorithm_params A named list of further parameters that need to be
 #' supplied to the optimization algorithm.
+#' @param x_names A character vector containing the names of the utility functions
+#' tuning parameters, automatically retrieved from `algorithm_params$par` or
+#' `algorithm_params$lower` if either is present. Default is `NULL`.
+#' @param fn_name The name of the function argument of `algorithm`. The
+#' default is `"fn"`.
 #' @param trace A logical or a character string, should the trace of the
 #' optimization algorithm be recorded? Default is `FALSE`. If `TRUE`, recording
 #' is done by dynamic appending of a data frame (which may not be
@@ -21,11 +26,9 @@
 #' trace. In that case, you can switch off using `trace = FALSE` (or `""` or
 #' `NULL`) and request the trace directly from your algorithm using
 #' `algorith_params`.
-#' @param x_names A character vector containing the names of the utility functions
-#' tuning parameters, automatically retrieved from `algorithm_params$par` or
-#' `algorithm_params$lower` if either is present. Default is `NULL`.
-#' @param fn_name The name of the function argument of `algorithm`. The
-#' default is `"fn"`.
+#' @param format_result (Optional:) A function `function(res)` for formatting
+#' the final output of the optimization algorithm.
+#'
 #'
 #' @return a list consisting of the algorithm's output (usually the optimal
 #' parameter vector and the resulting optimal utility value and some meta
@@ -64,8 +67,9 @@
 #'                                                       temp = 10,
 #'                                                       fnscale = -1)))
 opt_design_gen <- function(design, utility, algorithm, detail_params,
-                           utility_params, algorithm_params, trace = FALSE,
-                           x_names = NULL, fn_name = "fn"){
+                           utility_params, algorithm_params,
+                           x_names = NULL, fn_name = "fn",
+                           trace = FALSE, format_result = NULL){
   if(is.null(x_names)){
     if(!is.null(algorithm_params$lower)){
       x_names <- names(algorithm_params$lower)
@@ -77,9 +81,6 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
           algorithm_params$par or algorithm_params$lower.")
     }
   }
-  u_fun <- NULL
-  trace_rec <- NULL
-  connection <- NULL
   # Should the trace be recorded and/or saved to a file?
   if(is.null(trace)){
     trace_rec <- "none"
@@ -100,10 +101,10 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
                          detail_params = list(detail_params),
                          utility_params)))}
   } else if(trace_rec == "return" | trace_rec == "return and save"){
-    connection <- file(trace_path)
-    open(connection)
-    saveRDS(NULL, connection)
-    close(connection)
+    if(!file.exists(trace_path)){
+      file.create(trace_path)
+    }
+    saveRDS(NULL, trace_path)
     u_fun <- function(x){
       x_named <- x
       names(x_named) <- x_names
@@ -111,13 +112,8 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
                                x = list(x_named),
                                detail_params = list(detail_params),
                                utility_params))
-      browser()
-      alg_trace <- readRDS(connection)
-      assign("alg_trace", rbind(alg_trace, cbind(t(x_named), fn)),
-             envir = parent.frame())
-      open(connection)
-      saveRDS(alg_trace, connection)
-      close(connection)
+      alg_trace <- readRDS(trace_path)
+      saveRDS(rbind(alg_trace, cbind(t(x_named), fn)), trace_path)
       return(fn)
     }
   }
@@ -125,11 +121,17 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
             algorithm_params)
   names(args)[[1]] <- fn_name
   res <- do.call(algorithm, args)
+  if(!is.null(format_result)){
+    res <- format_result(res)
+  }
+  if(!("list" %in% class(res))){
+    res <- list(res = res)
+  }
   if(trace){
-    res[["trace"]] <- readRDS(connection)
+    res[["trace"]] <- readRDS(trace_path)
   }
   if(trace_rec == "return"){
-    # TODO delete the tmp trace file
+    file.remove(trace_path)
   }
   return(res)
 }
