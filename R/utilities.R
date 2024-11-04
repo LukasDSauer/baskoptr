@@ -365,7 +365,7 @@ u_avg <- function(design, x, detail_params, utility, utility_params,
   } else{
     # message("Use of future_apply in u_avg() is switched on.")
     u_vals <- future.apply::future_apply(X = p1s, MARGIN = 1, FUN = u_fun,
-                                         simplify = FALSE, future.seed=TRUE)
+                                         simplify = FALSE, future.seed = TRUE)
   }
   # Resulting utility is the weighted mean of utilities
   u_result <- sum(as.numeric(u_vals)*weights_u)
@@ -373,13 +373,16 @@ u_avg <- function(design, x, detail_params, utility, utility_params,
   # across all scenarios and all strata
   if(!is.null(threshold_maxtoer)){
     if(!is.null(attr(u_vals[[1]], "reduce_calculations"))){
-      if(attr(u_vals[[1]], "reduce_calculations")) stop(
-"It appears that you are trying to calculate maximal stratum-wise rejection
+      if(attr(u_vals[[1]], "reduce_calculations")){
+        browser()
+        stop(
+          "It appears that you are trying to calculate maximal stratum-wise rejection
   probabilities for u_ewp() or u_avg() with the option
   utility_params$reduce_calculations == TRUE.
   This may yield incorrect results. Please switch the utility function's
   parameter to
   utility_params$reduce_calculations <- FALSE.")
+      }
     }
     toers <- lapply(u_vals,
            function(x){
