@@ -374,7 +374,6 @@ u_avg <- function(design, x, detail_params, utility, utility_params,
   if(!is.null(threshold_maxtoer)){
     if(!is.null(attr(u_vals[[1]], "reduce_calculations"))){
       if(attr(u_vals[[1]], "reduce_calculations")){
-        browser()
         stop(
           "It appears that you are trying to calculate maximal stratum-wise rejection
   probabilities for u_ewp() or u_avg() with the option
