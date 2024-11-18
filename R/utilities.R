@@ -385,8 +385,8 @@ u_avg <- function(design, x, detail_params, utility, utility_params,
     }
     toers <- lapply(u_vals,
            function(x){
-             n <- names(attr(x, "details"))
-             return(lapply(n,
+             names_det <- names(attr(x, "details"))
+             return(lapply(names_det,
                            function(y) {
                              details <- attr(x, "details")[[y]]
                              return(details[["Rejection_Probabilities"]][
