@@ -28,6 +28,15 @@
 #' `algorith_params`.
 #' @param format_result (Optional:) A function `function(res)` for formatting
 #' the final output of the optimization algorithm.
+#' @param final_details A logical, if `TRUE`, the function runs the
+#' utility function one more time on the optimization result and returns the
+#' output of the implicit call to `baskwrap::get_details()` as
+#' `attr(, "details")` and the result of the repeated utility function call
+#' as `attr(, "res_repeated")`.
+#' @param final_details_utility_params A list, only takes effect if
+#' `final_details==TRUE`. This last run of the utility function will
+#' use these list of parameters instead of `utility_params`. However, the
+#' default is `final_details_utility_params = utility_params`.
 #'
 #'
 #' @return a list consisting of the algorithm's output (usually the optimal
@@ -69,7 +78,9 @@
 opt_design_gen <- function(design, utility, algorithm, detail_params,
                            utility_params, algorithm_params,
                            x_names = NULL, fn_name = "fn",
-                           trace = FALSE, format_result = NULL){
+                           trace = FALSE, format_result = NULL,
+                           final_details = FALSE,
+                           final_details_utility_params = utility_params){
   if(is.null(x_names)){
     if(!is.null(algorithm_params$lower)){
       x_names <- names(algorithm_params$lower)
@@ -111,7 +122,7 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
       fn <- do.call(utility, c(design = list(design),
                                x = list(x_named),
                                detail_params = list(detail_params),
-                               utility_params))
+                               final_details_utility_params))
       alg_trace <- readRDS(trace_path)
       saveRDS(rbind(alg_trace, cbind(t(x_named), fn)), trace_path)
       return(fn)
@@ -125,13 +136,25 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
     res <- format_result(res)
   }
   if(!("list" %in% class(res))){
-    res <- list(res = res)
+    res <- list(par = res)
   }
   if(trace){
     res[["trace"]] <- readRDS(trace_path)
   }
   if(trace_rec == "return"){
     file.remove(trace_path)
+  }
+  if(final_details){
+    utility_params$report_details <- TRUE
+    res_named <- res$par
+    names(res_named) <- x_names
+    res_repeated <- do.call(utility, c(design = list(design),
+                                       x = list(res_named),
+                                       detail_params = list(detail_params),
+                                       utility_params))
+    attr(res, "details") <- attr(res_repeated, "details")
+    attr(res_repeated, "details") <- NULL
+    attr(res, "res_repeated") <- attr(res_repeated, "details")
   }
   return(res)
 }

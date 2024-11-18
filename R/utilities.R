@@ -28,6 +28,8 @@
 #' @param threshold A numeric, for high FWER above this threshold we impose a
 #' penalty, default: 0.1.
 #' @param penalty A numeric, the scaling factor for FWER penalty, default: 1.
+#' @param report_details A logical, if `TRUE`, the function returns the output
+#' of the implicit call to `baskwrap::get_details()` as `attr(, "details")`.
 #' @param reduce_calculations A logical, only takes effect for the
 #' `"exact"` backend. If `TRUE`, the function will only execute the
 #' `get_details()` function for `p1` if the FWER for `p2` turned out
