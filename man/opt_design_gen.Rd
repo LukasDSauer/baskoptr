@@ -11,9 +11,12 @@ opt_design_gen(
   detail_params,
   utility_params,
   algorithm_params,
-  trace = FALSE,
   x_names = NULL,
-  fn_name = "fn"
+  fn_name = "fn",
+  trace = FALSE,
+  format_result = NULL,
+  final_details = FALSE,
+  final_details_utility_params = utility_params
 )
 }
 \arguments{
@@ -38,6 +41,13 @@ supplied to  the utility function.}
 \item{algorithm_params}{A named list of further parameters that need to be
 supplied to the optimization algorithm.}
 
+\item{x_names}{A character vector containing the names of the utility functions
+tuning parameters, automatically retrieved from \code{algorithm_params$par} or
+\code{algorithm_params$lower} if either is present. Default is \code{NULL}.}
+
+\item{fn_name}{The name of the function argument of \code{algorithm}. The
+default is \code{"fn"}.}
+
 \item{trace}{A logical or a character string, should the trace of the
 optimization algorithm be recorded? Default is \code{FALSE}. If \code{TRUE}, recording
 is done by dynamic appending of a data frame (which may not be
@@ -48,12 +58,21 @@ trace. In that case, you can switch off using \code{trace = FALSE} (or \code{""}
 \code{NULL}) and request the trace directly from your algorithm using
 \code{algorith_params}.}
 
-\item{x_names}{A character vector containing the names of the utility functions
-tuning parameters, automatically retrieved from \code{algorithm_params$par} or
-\code{algorithm_params$lower} if either is present. Default is \code{NULL}.}
+\item{format_result}{(Optional:) A function \verb{function(res)} for formatting
+the final output of the optimization algorithm.}
 
-\item{fn_name}{The name of the function argument of \code{algorithm}. The
-default is \code{"fn"}.}
+\item{final_details}{A logical, if \code{TRUE}, the function runs the
+utility function one more time on the optimization result and returns the
+output of the implicit call to \code{baskwrap::get_details()} as
+\code{attr(, "final_details")} and the result of the repeated utility function call
+as \code{attr(, "final_res_repeated")}. The latter should be identical to the
+result for deterministic calculations, but may differ for stochastic
+calculations.}
+
+\item{final_details_utility_params}{A list, only takes effect if
+\code{final_details==TRUE}. This last run of the utility function will
+use these list of parameters instead of \code{utility_params}. However, the
+default is \code{final_details_utility_params = utility_params}.}
 }
 \value{
 a list consisting of the algorithm's output (usually the optimal

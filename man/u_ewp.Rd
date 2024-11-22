@@ -52,6 +52,9 @@ penalty, default: 0.1.}
 
 \item{penalty}{A numeric, the scaling factor for FWER penalty, default: 1.}
 
+\item{report_details}{A logical, if \code{TRUE}, the function returns the output
+of the implicit call to \code{baskwrap::get_details()} as \code{attr(, "details")}.}
+
 \item{reduce_calculations}{A logical, only takes effect for the
 \code{"exact"} backend. If \code{TRUE}, the function will only execute the
 \code{get_details()} function for \code{p1} if the FWER for \code{p2} turned out

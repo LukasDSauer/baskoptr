@@ -10,9 +10,9 @@ append_details(details, index, further)
 set_details(details, index, value)
 }
 \arguments{
-\item{further}{A list of further parameters to be appended.}
+\item{index}{Indicates which element of \code{details} should be appended.}
 
-\item{value}{Any value that can be a list element.}
+\item{further}{A list of further parameters to be appended.}
 }
 \value{
 The updated list of \code{details}.

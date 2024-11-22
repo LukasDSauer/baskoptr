@@ -175,27 +175,27 @@ u_ecd <- function(design, x, detail_params, p1 = NULL,
 #' @return A list of two lists containing return values of `get_details` calls.
 get_details_for_two_scenarios <- function(design, x, detail_params, p1, p2,
                                           which_details_list){
-  details_params <- io_val_p1(detail_params, p1)
+  detail_params <- io_val_p1(detail_params, p1)
   if(!which_details_list == "all"){
-    details_params <- append_details(detail_params, "which_details",
+    detail_params <- append_details(detail_params, "which_details",
                                      further = which_details_list[["p1"]])
   }
   details_p1 <- do.call(baskwrap::get_details,
                       c(design = list(design),
                         as.list(x),
-                        details_params
+                        detail_params
                         ))
 
   # Calculate details under p2
   detail_params$p1 <- p2
   if(!which_details_list == "all"){
-    details_params <- append_details(detail_params, "which_details",
+    detail_params <- append_details(detail_params, "which_details",
                                      further = which_details_list[["p2"]])
   }
   details_p2 <- do.call(baskwrap::get_details,
                       c(design = list(design),
                         as.list(x),
-                        details_params))
+                        detail_params))
   return(list(p1 = details_p1,
               p2 = details_p2))
 }
@@ -505,7 +505,7 @@ set_details <- function(details, index, value){
 
 #' Internal helper function: Input validation for p1
 #'
-#' Returns `detail_params` with checked element `details_params$p1 <- p1`,
+#' Returns `detail_params` with checked element `detail_params$p1 <- p1`,
 #' depending on whether `p1` is not `NULL` or `detail_params$p1` is not `NULL`.
 #' Returns an error message if both are NULL.
 #'
