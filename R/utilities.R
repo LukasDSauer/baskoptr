@@ -72,8 +72,7 @@ u_ewp <- function(design, x, detail_params, p1 = NULL,
     }
     details_list <- get_details_for_two_scenarios(design, x, detail_params, p1,
                                                   p2, which_details_list =
-                                                    list(p1 = list("EWP"),
-                                                         p2 = list("FWER")))
+                                                    "all")
 
     ewp <-
       details_list[["p1"]]$EWP
@@ -129,8 +128,7 @@ u_ecd <- function(design, x, detail_params, p1 = NULL,
     details_list <- get_details_for_two_scenarios(design, x, detail_params, p1,
                                                   p2,
                                                   which_details_list =
-                                                    list(p1 = "ECD",
-                                                         p2 = "FWER"))
+                                                    "all")
     ecd <-
       details_list[["p1"]]$ECD
     fwer <-
@@ -178,19 +176,26 @@ u_ecd <- function(design, x, detail_params, p1 = NULL,
 get_details_for_two_scenarios <- function(design, x, detail_params, p1, p2,
                                           which_details_list){
   details_params <- io_val_p1(detail_params, p1)
+  if(!which_details_list == "all"){
+    details_params <- append_details(detail_params, "which_details",
+                                     further = which_details_list[["p1"]])
+  }
   details_p1 <- do.call(baskwrap::get_details,
                       c(design = list(design),
                         as.list(x),
-                        append_details(detail_params, "which_details",
-                                       further = which_details_list[["p1"]])))
+                        details_params
+                        ))
 
   # Calculate details under p2
   detail_params$p1 <- p2
+  if(!which_details_list == "all"){
+    details_params <- append_details(detail_params, "which_details",
+                                     further = which_details_list[["p2"]])
+  }
   details_p2 <- do.call(baskwrap::get_details,
                       c(design = list(design),
                         as.list(x),
-                        append_details(detail_params,  "which_details",
-                                       further = which_details_list[["p2"]])))
+                        details_params))
   return(list(p1 = details_p1,
               p2 = details_p2))
 }
@@ -484,8 +489,8 @@ u_bnd <-
 #' sets it to `value`.
 #'
 #' @inheritParams u_ewp
+#' @param index  Indicates which element of `details` should be appended.
 #' @param further  A list of further parameters to be appended.
-#' @param value  Any value that can be a list element.
 #' @return The updated list of `details`.
 append_details <- function(details, index, further){
   details[[index]] <- c(details[[index]], further)
