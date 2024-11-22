@@ -31,8 +31,10 @@
 #' @param final_details A logical, if `TRUE`, the function runs the
 #' utility function one more time on the optimization result and returns the
 #' output of the implicit call to `baskwrap::get_details()` as
-#' `attr(, "details")` and the result of the repeated utility function call
-#' as `attr(, "res_repeated")`.
+#' `attr(, "final_details")` and the result of the repeated utility function call
+#' as `attr(, "final_res_repeated")`. The latter should be identical to the
+#' result for deterministic calculations, but may differ for stochastic
+#' calculations.
 #' @param final_details_utility_params A list, only takes effect if
 #' `final_details==TRUE`. This last run of the utility function will
 #' use these list of parameters instead of `utility_params`. However, the
@@ -122,7 +124,7 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
       fn <- do.call(utility, c(design = list(design),
                                x = list(x_named),
                                detail_params = list(detail_params),
-                               final_details_utility_params))
+                               utility_params))
       alg_trace <- readRDS(trace_path)
       saveRDS(rbind(alg_trace, cbind(t(x_named), fn)), trace_path)
       return(fn)
@@ -145,16 +147,16 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
     file.remove(trace_path)
   }
   if(final_details){
-    utility_params$report_details <- TRUE
+    final_details_utility_params$report_details <- TRUE
     res_named <- res$par
     names(res_named) <- x_names
     res_repeated <- do.call(utility, c(design = list(design),
                                        x = list(res_named),
                                        detail_params = list(detail_params),
-                                       utility_params))
-    attr(res, "details") <- attr(res_repeated, "details")
-    attr(res_repeated, "details") <- NULL
-    attr(res, "res_repeated") <- attr(res_repeated, "details")
+                                       final_details_utility_params))
+    attr(res, "final_details") <- attr(res_repeated, "details")
+    attributes(res_repeated) <- NULL
+    attr(res, "final_res_repeated") <- res_repeated
   }
   return(res)
 }
