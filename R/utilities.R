@@ -242,9 +242,11 @@ get_details_for_two_scenarios <- function(design, x, detail_params, p1, p2,
 #'                             logbase = exp(1)),
 #'        penalty1 = 1, penalty2 = 2,
 #'        threshold = 0.1)
-u_2ewp <- function(design, x, detail_params, penalty1, penalty2, threshold,
+u_2ewp <- function(design, x, detail_params, p1 = NULL,
+                   penalty1, penalty2, threshold,
                    report_details = FALSE) {
   detail_params$which_details <- c(detail_params$which_details, "FWER", "EWP")
+  detail_params <- io_val_p1(detail_params, p1)
   details <- do.call(baskwrap::get_details,
                      c(design = list(design), as.list(x), detail_params))
   u_result <- NA_real_
@@ -264,10 +266,12 @@ u_2ewp <- function(design, x, detail_params, penalty1, penalty2, threshold,
 
 #' @rdname u_2ewp
 #' @export
-u_2pow <- function(design, x, detail_params, penalty1, penalty2, threshold,
+u_2pow <- function(design, x, detail_params, p1 = NULL,
+                   penalty1, penalty2, threshold,
                    report_details = FALSE) {
   detail_params$which_details <- c(detail_params$which_details,
                                    "Rejection_Probabilities")
+  detail_params <- io_val_p1(detail_params, p1)
   details <- do.call(baskwrap::get_details,
                      c(design = list(design), as.list(x), detail_params))
   alternative <- design$p0 != detail_params$p1
