@@ -20,8 +20,8 @@
 #' @param trace A logical or a character string, should the trace of the
 #' optimization algorithm be recorded? Default is `FALSE`. If `TRUE`, recording
 #' is done by dynamic appending of a data frame (which may not be
-#' very efficient). If `trace` is a character vector specifying a file path,
-#' the trace will be dynamically saved to an RDS file.
+#' very efficient). If `trace` is a character vector specifying a file path
+#' (ending with `".RDS"`), the trace will be dynamically saved to that RDS file.
 #' Some optimization algorithms automatically return their
 #' trace. In that case, you can switch off using `trace = FALSE` (or `""` or
 #' `NULL`) and request the trace directly from your algorithm using
@@ -95,15 +95,28 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
     }
   }
   # Should the trace be recorded and/or saved to a file?
+  trace_message <- 'The trace argument must be one of the following: A null object, a logical or character equal to an RDS file name or equal to "none", "report" or "report and save".'
   if(is.null(trace)){
     trace_rec <- "none"
   } else if(is.logical(trace)){
     trace_rec <- ifelse(trace, "return", "none")
     trace_path <- "trace_tmp.RDS"
   } else if(is.character(trace)){
-    trace_rec <- ifelse(trace == "", "none", "return and save")
-    trace_path <- trace
-    trace <- TRUE
+    if(trace == ""){
+      trace_rec <- "none"
+    } else if (trace == "none") {
+      trace_rec <- "none"
+    } else if (trace == "return" | trace == "return and save") {
+      trace_rec <- trace
+      trace_path <- "trace_tmp.RDS"
+    } else if (substr(trace, nchar(trace) - 3, nchar(trace)) == ".RDS"){
+      trace_rec <- "return and save"
+      trace_path <- trace
+    } else {
+      stop(trace_message)
+    }
+  } else{
+    stop(trace_message)
   }
   if(trace_rec == "none"){
     u_fun <- function(x){
@@ -140,7 +153,7 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
   if(!("list" %in% class(res))){
     res <- list(par = res)
   }
-  if(trace){
+  if(trace_rec %in% c("return", "return and save")){
     res[["trace"]] <- readRDS(trace_path)
   }
   if(trace_rec == "return"){
