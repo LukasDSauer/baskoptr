@@ -150,10 +150,6 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
   if(!is.null(format_result)){
     res <- format_result(res)
   }
-  if(!("list" %in% class(res))){
-    res <- list(par = res[names(res) != "value"],
-                value = res["value"])
-  }
   if(trace_rec %in% c("return", "return and save")){
     res[["trace"]] <- readRDS(trace_path)
   }
