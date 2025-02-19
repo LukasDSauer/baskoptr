@@ -26,6 +26,9 @@
 #' trace. In that case, you can switch off using `trace = FALSE` (or `""` or
 #' `NULL`) and request the trace directly from your algorithm using
 #' `algorith_params`.
+#' #' @param seeds A logical or a character string, should the trace of the
+#' random number generator seeds be recorded? Default is `FALSE`. You can
+#' specify `TRUE` or desired file path as for the `trace` argument.
 #' @param format_result (Optional:) A function `function(res)` for formatting
 #' the final output of the optimization algorithm.
 #' @param final_details A logical, if `TRUE`, the function runs the
@@ -80,7 +83,9 @@
 opt_design_gen <- function(design, utility, algorithm, detail_params,
                            utility_params, algorithm_params,
                            x_names = NULL, fn_name = "fn",
-                           trace = FALSE, format_result = NULL,
+                           trace = FALSE,
+                           seeds = FALSE,
+                           format_result = NULL,
                            final_details = FALSE,
                            final_details_utility_params = utility_params){
   if(is.null(x_names)){
@@ -94,30 +99,14 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
           algorithm_params$par or algorithm_params$lower.")
     }
   }
-  # Should the trace be recorded and/or saved to a file?
-  trace_message <- 'The trace argument must be one of the following: A null object, a logical or character equal to an RDS file name or equal to "none", "report" or "report and save".'
-  if(is.null(trace)){
-    trace_rec <- "none"
-  } else if(is.logical(trace)){
-    trace_rec <- ifelse(trace, "return", "none")
-    trace_path <- "trace_tmp.RDS"
-  } else if(is.character(trace)){
-    if(trace == ""){
-      trace_rec <- "none"
-    } else if (trace == "none") {
-      trace_rec <- "none"
-    } else if (trace == "return" | trace == "return and save") {
-      trace_rec <- trace
-      trace_path <- "trace_tmp.RDS"
-    } else if (substr(trace, nchar(trace) - 3, nchar(trace)) == ".RDS"){
-      trace_rec <- "return and save"
-      trace_path <- trace
-    } else {
-      stop(trace_message)
-    }
-  } else{
-    stop(trace_message)
-  }
+  # Should the trace/the seeds be recorded and/or saved to a file?
+  trace_info <- get_trace_info(trace)
+  trace_rec <- trace_info[["rec"]]
+  trace_path <- trace_info[["path"]]
+  seeds_info <- get_trace_info(seeds, type = "seeds")
+  seeds_rec <- seeds_info[["rec"]]
+  seeds_path <- seeds_info[["path"]]
+
   if(trace_rec == "none"){
     u_fun <- function(x){
       x_named <- x

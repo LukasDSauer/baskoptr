@@ -42,3 +42,46 @@ get_scenarios <- function(k, p0, p1, by = 1){
               p0 = p0,
               p1s = get_p1s(k, p0, p1, by)))
 }
+
+
+#' Decide whether to record a trace and what path to use
+#'
+#'
+#' @param trace A parameter that can be `FALSE`, `TRUE` or a file path.
+#' @param type A character that designated the name of the input.
+#'
+#' @return A list with components `rec` and `path`.
+get_trace_info <- function(trace, type = "trace"){
+  default_path <- paste0(type, "_tmp.RDS")
+  trace_message <-
+   paste('The', type , 'argument must be one of the following: A null object,
+   a logical or character equal to an RDS file name or equal to "none",
+   "report" or "report and save".')
+  if(is.null(trace)){
+    trace_rec <- "none"
+    trace_path <- NULL
+  } else if(is.logical(trace)){
+    trace_rec <- ifelse(trace, "return", "none")
+    trace_path <- ifelse(trace, default_path, NULL)
+  } else if(is.character(trace)){
+    if(trace == ""){
+      trace_rec <- "none"
+      trace_path <- NULL
+    } else if (trace == "none") {
+      trace_rec <- "none"
+      trace_path <- NULL
+    } else if (trace == "return" | trace == "return and save") {
+      trace_rec <- trace
+      trace_path <- default_path
+    } else if (substr(trace, nchar(trace) - 3, nchar(trace)) == ".RDS"){
+      trace_rec <- "return and save"
+      trace_path <- trace
+    } else {
+      stop(trace_message)
+    }
+  } else{
+    stop(trace_message)
+  }
+  return(list(rec = trace_rec,
+              path = trace_path))
+}
