@@ -44,11 +44,12 @@ get_scenarios <- function(k, p0, p1, by = 1){
 }
 
 
-#' Decide whether to record a trace and what path to use
+#' Internal helper function: Decide whether to record a trace and what path to
+#' use
 #'
 #'
 #' @param trace A parameter that can be `FALSE`, `TRUE` or a file path.
-#' @param type A character that designated the name of the input.
+#' @param type A character that designates the name of the input.
 #'
 #' @return A list with components `rec` and `path`.
 get_trace_info <- function(trace, type = "trace"){
@@ -62,7 +63,8 @@ get_trace_info <- function(trace, type = "trace"){
     trace_path <- NULL
   } else if(is.logical(trace)){
     trace_rec <- ifelse(trace, "return", "none")
-    trace_path <- ifelse(trace, default_path, NULL)
+    trace_path <- NULL
+    if(trace) trace_path <- default_path
   } else if(is.character(trace)){
     if(trace == ""){
       trace_rec <- "none"

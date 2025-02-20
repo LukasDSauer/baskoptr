@@ -18,7 +18,8 @@
 #' @param fn_name The name of the function argument of `algorithm`. The
 #' default is `"fn"`.
 #' @param trace A logical or a character string, should the trace of the
-#' optimization algorithm be recorded? Default is `FALSE`. If `TRUE`, recording
+#' optimization algorithm be recorded (utility values, parameters vectors,
+#' and random number seeds)? Default is `FALSE`. If `TRUE`, recording
 #' is done by dynamic appending of a data frame (which may not be
 #' very efficient). If `trace` is a character vector specifying a file path
 #' (ending with `".RDS"`), the trace will be dynamically saved to that RDS file.
@@ -26,9 +27,6 @@
 #' trace. In that case, you can switch off using `trace = FALSE` (or `""` or
 #' `NULL`) and request the trace directly from your algorithm using
 #' `algorith_params`.
-#' #' @param seeds A logical or a character string, should the trace of the
-#' random number generator seeds be recorded? Default is `FALSE`. You can
-#' specify `TRUE` or desired file path as for the `trace` argument.
 #' @param format_result (Optional:) A function `function(res)` for formatting
 #' the final output of the optimization algorithm.
 #' @param final_details A logical, if `TRUE`, the function runs the
@@ -47,8 +45,9 @@
 #' @return a list consisting of the algorithm's output (usually the optimal
 #' parameter vector and the resulting optimal utility value and some meta
 #' information). If `trace == TRUE`, the trace of the optimization algorithm
-#' can be found in the `[["trace"]]` argument of the list. (This overwrites
-#' any `[["trace"]]` argument in the algorithm's output.)
+#' can be found in the `[["trace"]]` entry of the list. (If the algorithm
+#' function also outputs a trace, this will be saved in an additional
+#'  `[["trace_alg"]]` entry.)
 #'
 #' @export
 #'
@@ -84,7 +83,6 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
                            utility_params, algorithm_params,
                            x_names = NULL, fn_name = "fn",
                            trace = FALSE,
-                           seeds = FALSE,
                            format_result = NULL,
                            final_details = FALSE,
                            final_details_utility_params = utility_params){
@@ -103,9 +101,6 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
   trace_info <- get_trace_info(trace)
   trace_rec <- trace_info[["rec"]]
   trace_path <- trace_info[["path"]]
-  seeds_info <- get_trace_info(seeds, type = "seeds")
-  seeds_rec <- seeds_info[["rec"]]
-  seeds_path <- seeds_info[["path"]]
 
   if(trace_rec == "none"){
     u_fun <- function(x){
@@ -123,12 +118,14 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
     u_fun <- function(x){
       x_named <- x
       names(x_named) <- x_names
+      seed <- .Random.seed
+      names(seed) <- paste0("seed", (1:length(seed)))
       fn <- do.call(utility, c(design = list(design),
                                x = list(x_named),
                                detail_params = list(detail_params),
                                utility_params))
       alg_trace <- readRDS(trace_path)
-      saveRDS(rbind(alg_trace, cbind(t(x_named), fn)), trace_path)
+      saveRDS(rbind(alg_trace, cbind(t(x_named), fn, t(seed))), trace_path)
       return(fn)
     }
   }
@@ -140,6 +137,9 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
     res <- format_result(res)
   }
   if(trace_rec %in% c("return", "return and save")){
+    if(!is.null(res[["trace"]])){
+      res[["trace_alg"]] <- res[["trace"]]
+    }
     res[["trace"]] <- readRDS(trace_path)
   }
   if(trace_rec == "return"){

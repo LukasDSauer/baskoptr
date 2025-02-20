@@ -19,7 +19,7 @@ can also be left \code{NULL}, then the function goes looking in
 The updated list of \code{detail_params}.
 }
 \description{
-Returns \code{detail_params} with checked element \code{details_params$p1 <- p1},
+Returns \code{detail_params} with checked element \code{detail_params$p1 <- p1},
 depending on whether \code{p1} is not \code{NULL} or \code{detail_params$p1} is not \code{NULL}.
 Returns an error message if both are NULL.
 }
