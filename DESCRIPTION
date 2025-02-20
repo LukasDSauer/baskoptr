@@ -1,6 +1,6 @@
 Package: baskoptr
 Title: Utility-based Optimization for Basket Trial Designs
-Version: 0.0.1.9001
+Version: 0.0.1.9002
 Description: What the package does (one paragraph).
 Authors@R: 
     person("Lukas D.", "Sauer", , "lukasdsauer@posteo.de", role = c("aut", "cre"),
