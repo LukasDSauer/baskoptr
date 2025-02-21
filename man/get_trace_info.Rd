@@ -10,7 +10,7 @@ get_trace_info(trace, type = "trace")
 \arguments{
 \item{trace}{A parameter that can be \code{FALSE}, \code{TRUE} or a file path.}
 
-\item{type}{A character that designated the name of the input.}
+\item{type}{A character that designates the name of the input.}
 }
 \value{
 A list with components \code{rec} and \code{path}.

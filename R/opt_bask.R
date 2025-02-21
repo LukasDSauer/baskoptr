@@ -125,7 +125,11 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
                                detail_params = list(detail_params),
                                utility_params))
       alg_trace <- readRDS(trace_path)
-      saveRDS(rbind(alg_trace, cbind(t(x_named), fn, t(seed))), trace_path)
+      saveRDS(rbind(alg_trace,
+                    data.frame(cbind(t(x_named),
+                                     fn,
+                                     t(seed)))),
+              trace_path)
       return(fn)
     }
   }
