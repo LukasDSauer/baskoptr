@@ -40,6 +40,11 @@
 #' `final_details==TRUE`. This last run of the utility function will
 #' use these list of parameters instead of `utility_params`. However, the
 #' default is `final_details_utility_params = utility_params`.
+#' @param progress_bar Do you want a progress bar? This argument either takes
+#' a numeric containing the number of steps or a `progressr::progressor()`. Only
+#' works if `trace` is activated. The number of steps is proportional to the
+#' number of algorithm iterations, but the exact number depends on the
+#' algorithm's implementation.
 #'
 #'
 #' @return a list consisting of the algorithm's output (usually the optimal
@@ -61,7 +66,8 @@
 #'                                     weight_fun = baskexact::weights_fujikawa,
 #'                                     logbase = exp(1))
 #' utility_params <- list(penalty = 1, thresh = 0.1)
-#' # Bounded simulated annealing
+#' # Bounded simulated annealing with progress bar
+#' progressr::handlers(global = TRUE)
 #' opt_design_gen(design = design,
 #'                utility = u_ewp,
 #'                algorithm = optimizr::simann,
@@ -78,14 +84,17 @@
 #'                                                  tau = 0.999),
 #'                                        control = list(maxit = 10,
 #'                                                       temp = 10,
-#'                                                       fnscale = -1)))
+#'                                                       fnscale = -1)),
+#'                                                       trace = TRUE,
+#'                 progress_bar = 10 + 2)
 opt_design_gen <- function(design, utility, algorithm, detail_params,
                            utility_params, algorithm_params,
                            x_names = NULL, fn_name = "fn",
                            trace = FALSE,
                            format_result = NULL,
                            final_details = FALSE,
-                           final_details_utility_params = utility_params){
+                           final_details_utility_params = utility_params,
+                           progress_bar = NULL){
   if(is.null(x_names)){
     if(!is.null(algorithm_params$lower)){
       x_names <- names(algorithm_params$lower)
@@ -95,6 +104,12 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
       stop("Cannot retrieve parameter vector names from algorithm_params and
           x_names is NULL. Please supply an x_names argument or
           algorithm_params$par or algorithm_params$lower.")
+    }
+  }
+  # Should progress be reported?
+  if(!is.null(progress_bar)){
+    if(is.numeric(progress_bar)){
+      progress_bar <- progressr::progressor(steps = progress_bar)
     }
   }
   # Should the trace/the seeds be recorded and/or saved to a file?
@@ -130,6 +145,10 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
                                      fn,
                                      t(seed)))),
               trace_path)
+      # Make progress update if requested
+      if(!is.null(progress_bar)){
+        progress_bar()
+      }
       return(fn)
     }
   }
