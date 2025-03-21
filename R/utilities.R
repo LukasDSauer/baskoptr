@@ -6,14 +6,19 @@
 #' correct decisions (ECD) if the family-wise error rate (FWER) is low and the
 #' negative FWER multiplied by a penalty parameter if the FWER is high.
 #'
-#' The utility functions are
+#' The utility function `u_ewp` is defined as
 #' defined as
 #' \deqn{u_{\text{ewp}}(x,\mathbf{p_1},\mathbf{p_2})=\mathrm{ewp}
 #' (x,\mathbf{p_1}),}
 #' if the FWER fulfills \eqn{\mathrm{fwer}(x,\mathbf{p_2}) < \eta_1}, and
 #' \deqn{u_{\text{ewp}}(x,\mathbf{p_1},\mathbf{p_2})=
 #' -\xi_1\cdot\mathrm{fwer}(x,\mathbf{p_2}),}
-#' if \eqn{\mathrm{fwer}(x,\mathbf{p_2}) \geq \eta_1}.
+#' if \eqn{\mathrm{fwer}(x,\mathbf{p_2}) \geq \eta_1}. The parameter
+#' \eqn{\eta_1} is called the threshold, the parameter \eqn{\xi_1} is called
+#' the penalty.
+#'
+#' The utility function `u_ecd` is defined analogously with the expected number
+#' of correct decisions instead of the experiment-wise power.
 #'
 #' @inheritParams params_main
 #' @param x  A named list, the design's tuning parameters to be optimized.
@@ -210,8 +215,15 @@ get_details_for_two_scenarios <- function(design, x, detail_params, p1, p2,
 #' \deqn{u_{\text{2ewp}}(\boldsymbol\phi,\mathbf{p}) = \mathrm{ewp}(\boldsymbol
 #' \phi,\mathbf{p}) - \left(\xi_1\mathrm{fwer}(\boldsymbol\phi,\mathbf{p}) +
 #' \xi_2(\mathrm{fwer}(\boldsymbol\phi,\mathbf{p}) - \eta)\mathbf 1(
-#' \mathrm{fwer}(\boldsymbol\phi,\mathbf{p}) - \eta) \right)}
+#' \mathrm{fwer}(\boldsymbol\phi,\mathbf{p}) - \eta) \right),}
 #' where \eqn{\eta\in[0,1]} is a threshold for imposing harsher FWER penalty.
+#'
+#' The utility function \eqn{u_{\text{2pow}}} is defined analogously as
+#' \deqn{u_{\text{2pow}}(\boldsymbol\phi,\mathbf{p}) = \sum_{i\in R}\mathrm{pow}_i(\boldsymbol
+#' \phi,\mathbf{p}) - \sum_{j\in R^c}\left(\xi_1\mathrm{toer}_j(\boldsymbol\phi,\mathbf{p}) +
+#' \xi_2(\mathrm{toer}_j(\boldsymbol\phi,\mathbf{p}) - \eta)\mathbf 1(
+#' \mathrm{toer}_j(\boldsymbol\phi,\mathbf{p}) - \eta) \right),}
+#' where \eqn{R} and \eqn{R^c} are the sets of active and inactive strata, respectively.
 #'
 #' @inheritParams params_main
 #' @param penalty1 A numeric, `penalty1` is the penalty for low FWER,

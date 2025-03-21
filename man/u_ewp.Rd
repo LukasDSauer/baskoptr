@@ -71,14 +71,19 @@ correct decisions (ECD) if the family-wise error rate (FWER) is low and the
 negative FWER multiplied by a penalty parameter if the FWER is high.
 }
 \details{
-The utility functions are
+The utility function \code{u_ewp} is defined as
 defined as
 \deqn{u_{\text{ewp}}(x,\mathbf{p_1},\mathbf{p_2})=\mathrm{ewp}
 (x,\mathbf{p_1}),}
 if the FWER fulfills \eqn{\mathrm{fwer}(x,\mathbf{p_2}) < \eta_1}, and
 \deqn{u_{\text{ewp}}(x,\mathbf{p_1},\mathbf{p_2})=
 -\xi_1\cdot\mathrm{fwer}(x,\mathbf{p_2}),}
-if \eqn{\mathrm{fwer}(x,\mathbf{p_2}) \geq \eta_1}.
+if \eqn{\mathrm{fwer}(x,\mathbf{p_2}) \geq \eta_1}. The parameter
+\eqn{\eta_1} is called the threshold, the parameter \eqn{\xi_1} is called
+the penalty.
+
+The utility function \code{u_ecd} is defined analogously with the expected number
+of correct decisions instead of the experiment-wise power.
 }
 \examples{
 # Calculating the EWP utility using basksim as a backend
