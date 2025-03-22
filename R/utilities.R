@@ -266,7 +266,7 @@ u_2ewp <- function(design, x, detail_params, p1 = NULL,
     details$EWP
   fwer <- details$FWER
   if(fwer > threshold){
-    u_result <- ewp - (penalty1*fwer - penalty2*(fwer - threshold))
+    u_result <- ewp - (penalty1*fwer + penalty2*(fwer - threshold))
   } else{
     u_result <- ewp - (penalty1*fwer)
   }
