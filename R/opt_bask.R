@@ -106,6 +106,15 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
           algorithm_params$par or algorithm_params$lower.")
     }
   }
+  if(!is.null(utility_params$detail_params)){
+    if(!is.null(detail_params)){
+      stop("utility_params$detail_params and detail_params are not NULL. You may supply only one of them.")
+    } else{
+      detail_params <- utility_params$detail_params
+      utility_params$detail_params <- NULL
+    }
+
+  }
   # Should progress be reported?
   if(!is.null(progress_bar)){
     if(is.numeric(progress_bar)){
