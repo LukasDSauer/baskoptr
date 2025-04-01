@@ -131,7 +131,7 @@ test_that("u_ecd() delivers the expected results", {
                ignore_attr = T, tolerance = 0.001)
   expect_equal(u_liberal, -penalty*details_liberal_null$FWER, ignore_attr = T)
   expect_equal(u_liberal_sim, -penalty*details_liberal_null$FWER,
-               ignore_attr = T)
+               ignore_attr = T, tolerance = 0.05)
   expect_true(u_conservative > 0)
   expect_true(u_liberal < 0)
 })

@@ -165,6 +165,8 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
             algorithm_params)
   names(args)[[1]] <- fn_name
   res <- do.call(algorithm, args)
+  res_named <- res$par
+  names(res_named) <- x_names
   if(!is.null(format_result)){
     res <- format_result(res)
   }
@@ -179,8 +181,6 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
   }
   if(final_details){
     final_details_utility_params$report_details <- TRUE
-    res_named <- res$par
-    names(res_named) <- x_names
     res_repeated <- do.call(utility, c(design = list(design),
                                        x = list(res_named),
                                        detail_params = list(detail_params),
