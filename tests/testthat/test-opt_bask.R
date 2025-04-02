@@ -95,7 +95,7 @@ test_that("simulated annealing can retrieve parameter names, trace recorded by
     opt_design_gen(design = design3,
                    utility = u_ewp,
                    algorithm = optimizr::simann,
-                   detail_params = c(detail_params_fuj, verbose = F),
+                   detail_params = detail_params_fuj,
                    utility_params = list(p1 = p1,
                                          threshold = threshold,
                                          penalty = penalty),

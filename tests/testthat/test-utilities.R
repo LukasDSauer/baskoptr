@@ -5,6 +5,14 @@ details_vconservative <- baskwrap::get_details(design4,
                                               epsilon = x_fuj_vconservative$epsilon,
                                               tau = x_fuj_vconservative$tau,
                                               logbase = logbase)
+details_vconservative_null <- baskwrap::get_details(design4,
+                                               n = detail_params_fuj$n,
+                                               p1 = p0,
+                                               lambda = x_fuj_vconservative$lambda,
+                                               epsilon = x_fuj_vconservative$epsilon,
+                                               tau = x_fuj_vconservative$tau,
+                                               logbase = logbase,
+                                               verbose = F)
 details_conservative <- baskwrap::get_details(design4,
                                               n = detail_params_fuj$n,
                                               p1 = p1_high,
@@ -32,7 +40,8 @@ details_liberal_null <- baskwrap::get_details(design4,
                                               lambda = lambda_liberal,
                                               epsilon = epsilon,
                                               tau = tau,
-                                              logbase = logbase)
+                                              logbase = logbase,
+                                              verbose = F)
 test_that("u_avg() returns an error message if used with  u_ewp(),
           reduce_calculations == FALSE and 'exact' backend.", {
   design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
@@ -68,7 +77,8 @@ test_that("u_ewp() delivers the expected results", {
                               p1 = p1_high,
                               threshold = thresh,
                               penalty = penalty,
-                              report_details = TRUE)
+                              report_details = TRUE,
+                              reduce_calculations = TRUE)
   u_liberal <- u_ewp(design = design4,
                           x = x_fuj_liberal,
                           detail_params = detail_params_fuj,
@@ -91,6 +101,12 @@ test_that("u_ewp() delivers the expected results", {
                ignore_attr = TRUE, tolerance = 0.05)
   expect_true(u_conservative > 0)
   expect_true(u_liberal < 0)
+  # Error message for missing p1
+  expect_error(u_ewp(design = design4,
+                     x = x_fuj_conservative,
+                     detail_params = detail_params_fuj,
+                     threshold = thresh,
+                     penalty = penalty))
 })
 
 test_that("u_ecd() delivers the expected results", {
@@ -110,7 +126,8 @@ test_that("u_ecd() delivers the expected results", {
                           p1 = p1_low,
                           threshold = thresh,
                           penalty = penalty,
-                          report_details = TRUE)
+                          report_details = TRUE,
+                          reduce_calculations = TRUE)
   u_liberal <- u_ecd(design = design4,
                      x = x_fuj_liberal,
                      detail_params = detail_params_fuj,
@@ -306,8 +323,49 @@ test_that("u_avg() delivers the expected results", {
                  utility = u_2ewp,
                  utility_params = utility_params_2ewp,
                  p1s = rbind(p1_high, p0))
+  u_val_maxtoer <- u_avg(design = design4,
+                         x = x_fuj_vconservative,
+                         detail_params = detail_params_fuj,
+                         utility = u_2ewp,
+                         utility_params = utility_params_2ewp,
+                         p1s = rbind(p1_high, p0),
+                         threshold_maxtoer = 0.07,
+                         penalty_maxtoer = 1000,
+                         report_details = TRUE,
+                         use_future = TRUE)
+  # Expecting error because only threshold_maxtoer was supplied without penalty.
+  expect_error({u_avg(design = design4,
+                 x = x_fuj_vconservative,
+                 detail_params = detail_params_fuj,
+                 utility = u_2ewp,
+                 utility_params = utility_params_2ewp,
+                 p1s = rbind(p1_high, p0),
+                 threshold_maxtoer = 0.07)})
+  # Expecting error for reduce_calculations in u_ewp and u_ecd
+  expect_error({u_avg(design = design4,
+                x = x_fuj_vconservative,
+                detail_params = detail_params_fuj,
+                utility = u_ewp,
+                utility_params = list(penalty = 1, threshold = 0.2, reduce_calculations = TRUE),
+                p1s = rbind(p1_high, p0), threshold_maxtoer = 0.07,
+                penalty_maxtoer = 1000)}
+        )
+  expect_error({u_avg(design = design4,
+                      x = x_fuj_vconservative,
+                      detail_params = detail_params_fuj,
+                      utility = u_ecd,
+                      utility_params = list(penalty = 1, threshold = 0.2, reduce_calculations = TRUE),
+                      p1s = rbind(p1_high, p0), threshold_maxtoer = 0.07,
+                      penalty_maxtoer = 1000)}
+  )
+  # Compare to reference
   expect_equal(u_val, u_ref, ignore_attr = T)
+  expect_equal(u_val_maxtoer,
+               -1000*details_vconservative$Rejection_Probabilities[1],
+               ignore_attr = T)
   expect_equal(u_val_sim, u_ref, ignore_attr = T, tolerance = 0.05)
+  expect_equal(attr(u_val_maxtoer, "details")$`c(0.1, 0.1, 0.1, 0.1)`$p1$FWER,
+               details_vconservative_null$FWER)
 })
 
 test_that("u_bnd() delivers the expected results", {

@@ -182,8 +182,11 @@ get_details_for_two_scenarios <- function(design, x, detail_params, p1, p2,
                                           which_details_list){
   detail_params <- io_val_p1(detail_params, p1)
   if(!which_details_list == "all"){
+    # The following line is currently not in use
+    # nocov start
     detail_params <- append_details(detail_params, "which_details",
                                      further = which_details_list[["p1"]])
+    # nocov end
   }
   details_p1 <- do.call(baskwrap::get_details,
                       c(design = list(design),
@@ -194,8 +197,11 @@ get_details_for_two_scenarios <- function(design, x, detail_params, p1, p2,
   # Calculate details under p2
   detail_params$p1 <- p2
   if(!which_details_list == "all"){
+    # The following line is currently not in use
+    # nocov start
     detail_params <- append_details(detail_params, "which_details",
                                      further = which_details_list[["p2"]])
+    # nocov end
   }
   details_p2 <- do.call(baskwrap::get_details,
                       c(design = list(design),
@@ -369,6 +375,9 @@ u_avg <- function(design, x, detail_params, utility, utility_params,
                   report_details = FALSE,
                   penalty_maxtoer = NULL, threshold_maxtoer = NULL,
                   use_future = FALSE){
+  if(xor(is.null(penalty_maxtoer), is.null(threshold_maxtoer))){
+    stop("Only one of penalty_maxtoer and threshold_maxtoer was supplied. You must supply both or nothing at all.")
+  }
   detail_params$which_details <- c(detail_params$which_details,
                                    "Rejection_Probabilities")
   u_result <- NA_real_

@@ -4,7 +4,8 @@ design4 <- baskwrap::setup_fujikawa_x(k = 4, shape1 = 1, shape2 = 1,
 logbase <- 3
 detail_params_fuj <- list(n = 15,
                           weight_fun = baskexact::weights_fujikawa,
-                          logbase = logbase)
+                          logbase = logbase,
+                          verbose = FALSE)
 epsilon <- 1.5
 tau <- 0.25
 lambda_conservative <- 0.99
