@@ -108,7 +108,7 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
   }
   if(!is.null(utility_params$detail_params)){
     if(!is.null(detail_params)){
-      stop("utility_params$detail_params and detail_params are not NULL. You may supply only one of them.")
+      stop("Both utility_params$detail_params and detail_params are not NULL. You may supply only one of them.")
     } else{
       detail_params <- utility_params$detail_params
       utility_params$detail_params <- NULL
