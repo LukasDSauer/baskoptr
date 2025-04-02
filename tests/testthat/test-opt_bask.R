@@ -40,9 +40,10 @@ test_that("grid search on small grid with u_2pow() works.", {
                          algorithm_params = list(axes = axes,
                                                  control = alg_control),
                          x_names = c("lambda", "epsilon", "tau"),
-                         trace = TRUE)
+                         trace = FALSE)
   expect_equal(res$par, opt_ref)
   expect_equal(res$value, val_ref)
+  expect_true(is.null(res$trace))
 })
 
 test_that("grid search can retrieve parameter names, trace can be switched
@@ -75,7 +76,6 @@ test_that("grid search can retrieve parameter names, trace can be switched
   expect_equal(res, c(opt_ref, value = val_ref), ignore_attr = T)
   expect_equal(attr(res, "final_details")$p1$Rejection_Probabilities,
                details$Rejection_Probabilities)
-  expect_true(is.null(res$trace))
 })
 
 test_that("simulated annealing can retrieve parameter names, trace recorded by
@@ -135,3 +135,54 @@ test_that("simulated annealing can retrieve parameter names, trace recorded by
   expect_true(all(res$value >= res$trace$fn))
   expect_equal(length(which(res$value > res$trace$fn)), nrow(res$trace) - 2)
 })
+
+
+test_that("error message for duplicate detail_params is thrown.",
+          {
+  expect_error(opt_design_gen(design = design4,
+                              utility = u_2pow,
+                              algorithm = optimizr::gridsearch,
+                              # First detail_params
+                              detail_params = detail_params_fuj,
+                              # Second detail_params
+                              utility_params = list(detail_params = detail_params_fuj,
+                                                    p1 = p1_high,
+                                                    threshold = threshold,
+                                                    penalty1 = penalty1,
+                                                    penalty2 = penalty2),
+                              algorithm_params = list(lower = c(lambda = 0.1,
+                                                                epsilon = 1,
+                                                                tau = 0.01),
+                                                      upper = c(lambda = 0.99,
+                                                                epsilon = 2,
+                                                                tau = 0.5),
+                                                      step = c(lambda = 0.89,
+                                                               epsilon = 1,
+                                                               tau = 0.49),
+                                                      control = alg_control),
+                              trace = FALSE,
+                              format_result = format_fun,
+                              final_details = TRUE))
+          })
+
+test_that("error message for lack of parameter names is thrown.",
+          {
+  expect_error(opt_design_gen(design = design4,
+                              utility = u_2pow,
+                              algorithm = optimizr::gridsearch,
+                              detail_params = detail_params_fuj,
+                              utility_params = list(detail_params = detail_params_fuj,
+                                                    p1 = p1_high,
+                                                    threshold = threshold,
+                                                    penalty1 = penalty1,
+                                                    penalty2 = penalty2),
+                              algorithm_params = list(grid = data.frame(
+                                lambda = 0.5,
+                                epsilon = 1,
+                                tau = 0.5
+                              )),
+                              trace = FALSE,
+                              format_result = format_fun,
+                              final_details = TRUE))
+          })
+
