@@ -17,6 +17,7 @@ details <- baskwrap::get_details(design4,
                                  epsilon = opt_ref["epsilon"],
                                  tau = opt_ref["tau"],
                                  logbase = logbase)
+
 val_ref <- details$Rejection_Probabilities[3] +
   details$Rejection_Probabilities[4] -
   penalty1*(details$Rejection_Probabilities[1] +
@@ -24,7 +25,7 @@ val_ref <- details$Rejection_Probabilities[3] +
   penalty2*(details$Rejection_Probabilities[1] +
               details$Rejection_Probabilities[2] -
               2*threshold)
-test_that("grid search on small grid with u_2pow() works.", {
+test_that("grid search on small grid with u_2pow() works", {
   axes <- list(lambda = c(0.1, 0.99),
                epsilon = c(1, 2),
                tau = c(0.01, 0.5))
@@ -46,8 +47,74 @@ test_that("grid search on small grid with u_2pow() works.", {
   expect_true(is.null(res$trace))
 })
 
+test_that("trace options work", {
+  grid <- data.frame(lambda = c(0.9, 0.9), epsilon = c(1, 2), tau = c(0.5, 0.5))
+  # Returning trace.
+  res <- opt_design_gen(design = design4,
+                        utility = u_2pow,
+                        algorithm = optimizr::gridsearch,
+                        detail_params = NULL,
+                        utility_params = list(detail_params = detail_params_fuj,
+                                              p1 = p1_high,
+                                              threshold = threshold,
+                                              penalty1 = penalty1,
+                                              penalty2 = penalty2),
+                        algorithm_params = list(grid = grid,
+                                                control = alg_control),
+                        x_names = c("lambda", "epsilon", "tau"),
+                        trace = "return")
+  expect_equal(res$trace$lambda, grid$lambda)
+  expect_equal(res$trace$epsilon, grid$epsilon)
+  # Saving trace to custom path.
+  trace_path <- test_path(path_refdata_rel, "ref_trace.RDS")
+  expect_false(file.exists(trace_path))
+  res <- opt_design_gen(design = design4,
+                        utility = u_2pow,
+                        algorithm = optimizr::gridsearch,
+                        detail_params = NULL,
+                        utility_params = list(detail_params = detail_params_fuj,
+                                              p1 = p1_high,
+                                              threshold = threshold,
+                                              penalty1 = penalty1,
+                                              penalty2 = penalty2),
+                        algorithm_params = list(grid = grid,
+                                                control = alg_control),
+                        x_names = c("lambda", "epsilon", "tau"),
+                        trace = trace_path)
+  expect_true(file.exists(trace_path))
+  expect_true(res$value %in% res$trace$fn)
+  file.remove(trace_path)
+  # Wrong trace options, e.g. numbers and wrong strings
+  expect_error({opt_design_gen(design = design4,
+                              utility = u_2pow,
+                              algorithm = optimizr::gridsearch,
+                              detail_params = NULL,
+                              utility_params = list(detail_params = detail_params_fuj,
+                                                    p1 = p1_high,
+                                                    threshold = threshold,
+                                                    penalty1 = penalty1,
+                                                    penalty2 = penalty2),
+                              algorithm_params = list(grid = grid,
+                                                      control = alg_control),
+                              x_names = c("lambda", "epsilon", "tau"),
+                              trace = "wrongfile.txt")})
+  expect_error({opt_design_gen(design = design4,
+                               utility = u_2pow,
+                               algorithm = optimizr::gridsearch,
+                               detail_params = NULL,
+                               utility_params = list(detail_params = detail_params_fuj,
+                                                     p1 = p1_high,
+                                                     threshold = threshold,
+                                                     penalty1 = penalty1,
+                                                     penalty2 = penalty2),
+                               algorithm_params = list(grid = grid,
+                                                       control = alg_control),
+                               x_names = c("lambda", "epsilon", "tau"),
+                               trace = 123)})
+})
+
 test_that("grid search can retrieve parameter names, trace can be switched
-           off, output can be manually formatted.", {
+           off, output can be manually formatted", {
   format_fun <- function(res) {
       return(c(res[["par"]], value = res[["value"]]))
     }
@@ -70,7 +137,7 @@ test_that("grid search can retrieve parameter names, trace can be switched
                                                          epsilon = 1,
                                                          tau = 0.49),
                                                 control = alg_control),
-                        trace = FALSE,
+                        trace = "none",
                         format_result = format_fun,
                         final_details = TRUE)
   expect_equal(res, c(opt_ref, value = val_ref), ignore_attr = T)
@@ -80,7 +147,7 @@ test_that("grid search can retrieve parameter names, trace can be switched
 
 test_that("simulated annealing can retrieve parameter names, trace recorded by
           algorithm is saved in trace_alg if trace is also recorded by
-          opt_design_gen.", {
+          opt_design_gen", {
   set.seed(1213)
   p0 <- 0.2
   p1 <- c(0.2, 0.4, 0.4)
@@ -137,7 +204,7 @@ test_that("simulated annealing can retrieve parameter names, trace recorded by
 })
 
 
-test_that("error message for duplicate detail_params is thrown.",
+test_that("error message for duplicate detail_params is thrown",
           {
   expect_error(opt_design_gen(design = design4,
                               utility = u_2pow,
@@ -160,12 +227,12 @@ test_that("error message for duplicate detail_params is thrown.",
                                                                epsilon = 1,
                                                                tau = 0.49),
                                                       control = alg_control),
-                              trace = FALSE,
+                              trace = "",
                               format_result = format_fun,
                               final_details = TRUE))
           })
 
-test_that("error message for lack of parameter names is thrown.",
+test_that("error message for lack of parameter names is thrown",
           {
   expect_error(opt_design_gen(design = design4,
                               utility = u_2pow,

@@ -1,49 +1,5 @@
-details_vconservative <- baskwrap::get_details(design4,
-                                              n = detail_params_fuj$n,
-                                              p1 = p1_high,
-                                              lambda = x_fuj_vconservative$lambda,
-                                              epsilon = x_fuj_vconservative$epsilon,
-                                              tau = x_fuj_vconservative$tau,
-                                              logbase = logbase)
-details_vconservative_null <- baskwrap::get_details(design4,
-                                               n = detail_params_fuj$n,
-                                               p1 = p0,
-                                               lambda = x_fuj_vconservative$lambda,
-                                               epsilon = x_fuj_vconservative$epsilon,
-                                               tau = x_fuj_vconservative$tau,
-                                               logbase = logbase,
-                                               verbose = F)
-details_conservative <- baskwrap::get_details(design4,
-                                              n = detail_params_fuj$n,
-                                              p1 = p1_high,
-                                              lambda = lambda_conservative,
-                                              epsilon = epsilon,
-                                              tau = tau,
-                                              logbase = logbase)
-details_conservative_lowpower <- baskwrap::get_details(design4,
-                                              n = detail_params_fuj$n,
-                                              p1 = p1_low,
-                                              lambda = lambda_conservative,
-                                              epsilon = epsilon,
-                                              tau = tau,
-                                              logbase = logbase)
-details_liberal_alt <- baskwrap::get_details(design4,
-                                         n = detail_params_fuj$n,
-                                         p1 = p1_high,
-                                         lambda = lambda_liberal,
-                                         epsilon = epsilon,
-                                         tau = tau,
-                                         logbase = logbase)
-details_liberal_null <- baskwrap::get_details(design4,
-                                              n = detail_params_fuj$n,
-                                              p1 = p0,
-                                              lambda = lambda_liberal,
-                                              epsilon = epsilon,
-                                              tau = tau,
-                                              logbase = logbase,
-                                              verbose = F)
 test_that("u_avg() returns an error message if used with  u_ewp(),
-          reduce_calculations == FALSE and 'exact' backend.", {
+          reduce_calculations == FALSE and 'exact' backend", {
   design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
                                        p0 = 0.2, backend = "exact")
   x <- list(lambda = 0.99, epsilon = 2, tau = 0.5)
