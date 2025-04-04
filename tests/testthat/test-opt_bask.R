@@ -48,7 +48,37 @@ test_that("grid search on small grid with u_2pow() works", {
 })
 
 test_that("trace options work", {
+  set.seed(1718)
   grid <- data.frame(lambda = c(0.9, 0.9), epsilon = c(1, 2), tau = c(0.5, 0.5))
+  # Not returning trace.
+  res <- opt_design_gen(design = design4,
+                        utility = u_2pow,
+                        algorithm = optimizr::gridsearch,
+                        detail_params = NULL,
+                        utility_params = list(detail_params = detail_params_fuj,
+                                              p1 = p1_high,
+                                              threshold = threshold,
+                                              penalty1 = penalty1,
+                                              penalty2 = penalty2),
+                        algorithm_params = list(grid = grid,
+                                                control = alg_control),
+                        x_names = c("lambda", "epsilon", "tau"),
+                        trace = "")
+  expect_true(is.null(res$trace))
+  res <- opt_design_gen(design = design4,
+                        utility = u_2pow,
+                        algorithm = optimizr::gridsearch,
+                        detail_params = NULL,
+                        utility_params = list(detail_params = detail_params_fuj,
+                                              p1 = p1_high,
+                                              threshold = threshold,
+                                              penalty1 = penalty1,
+                                              penalty2 = penalty2),
+                        algorithm_params = list(grid = grid,
+                                                control = alg_control),
+                        x_names = c("lambda", "epsilon", "tau"),
+                        trace = NULL)
+  expect_true(is.null(res$trace))
   # Returning trace.
   res <- opt_design_gen(design = design4,
                         utility = u_2pow,

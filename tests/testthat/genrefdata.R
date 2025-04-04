@@ -2,8 +2,8 @@
 
 # SETUP
 # Load all functions, e.g. using devtools::load_all()
-
-# Generate results for comparison
+# GENERATE REFERENCE DATA FOR THE TESTS
+source(test_path("helper-parameters.R"))
 details_vconservative <- baskwrap::get_details(design4,
                                                n = detail_params_fuj$n,
                                                p1 = p1_high,

@@ -23,4 +23,7 @@ test_that("extreme borrowing cutoff is plausible", {
   expect_equal(mat_eps_ex[7, 6], 0)
   expect_true(any(mat_eps_ex != mat_lt_eps_ex))
   expect_gte(mat_lt_eps_ex[7, 6], tau)
+  # tau_extreme should be inverse to epsilon_extreme
+  tau_ex <- tau_extreme(design4, epsilon = eps_ex, detail_params)
+  expect_equal(tau_ex, tau)
 })
