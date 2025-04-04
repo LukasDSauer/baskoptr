@@ -57,14 +57,14 @@ The utility function \eqn{u_{\text{2ewp}}} is defined as
 \deqn{u_{\text{2ewp}}(\boldsymbol\phi,\mathbf{p}) = \mathrm{ewp}(\boldsymbol
 \phi,\mathbf{p}) - \left(\xi_1\mathrm{fwer}(\boldsymbol\phi,\mathbf{p}) +
 \xi_2(\mathrm{fwer}(\boldsymbol\phi,\mathbf{p}) - \eta)\mathbf 1(
-\mathrm{fwer}(\boldsymbol\phi,\mathbf{p}) - \eta) \right)}
+\mathrm{fwer}(\boldsymbol\phi,\mathbf{p}) - \eta) \right),}
 where \eqn{\eta\in[0,1]} is a threshold for imposing harsher FWER penalty.
 
-The utility function \eqn{u_{\text{2pow}}} is defined analogously
+The utility function \eqn{u_{\text{2pow}}} is defined analogously as
 \deqn{u_{\text{2pow}}(\boldsymbol\phi,\mathbf{p}) = \sum_{i\in R}\mathrm{pow}_i(\boldsymbol
 \phi,\mathbf{p}) - \sum_{j\in R^c}\left(\xi_1\mathrm{toer}_j(\boldsymbol\phi,\mathbf{p}) +
 \xi_2(\mathrm{toer}_j(\boldsymbol\phi,\mathbf{p}) - \eta)\mathbf 1(
-\mathrm{toer}_j(\boldsymbol\phi,\mathbf{p}) - \eta) \right)}
+\mathrm{toer}_j(\boldsymbol\phi,\mathbf{p}) - \eta) \right),}
 where \eqn{R} and \eqn{R^c} are the sets of active and inactive strata, respectively.
 }
 \examples{

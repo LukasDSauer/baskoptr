@@ -7,6 +7,7 @@
 
 [![Codecov test
 coverage](https://codecov.io/gh/LukasDSauer/baskoptr/graph/badge.svg)](https://app.codecov.io/gh/LukasDSauer/baskoptr)
+[![R-CMD-check](https://github.com/LukasDSauer/baskoptr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/LukasDSauer/baskoptr/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of **baskoptr** is to supply a unified framework for optimizing
