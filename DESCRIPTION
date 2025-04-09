@@ -7,10 +7,10 @@ Authors@R:
            comment = c(ORCID = "0000-0002-1340-9994"))
 License: MIT + file LICENSE
 Imports:
-  baskwrap,
-  future.apply
+    baskwrap (>= 0.0.0.9000),
+    future.apply
 Suggests:
-    optimizr,
+    optimizr (>= 0.1.0),
     baskexact,
     testthat (>= 3.0.0),
     progressr,
@@ -19,3 +19,6 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3
+Remotes:  
+    LukasDSauer/baskwrap,
+    LukasDSauer/optimizr

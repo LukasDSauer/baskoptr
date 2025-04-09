@@ -134,7 +134,6 @@ get_trace_info <- function(trace, type = "trace"){
 #' the list `further`. `set_details` takes the element `details[["index"]]` and
 #' sets it to `value`.
 #'
-#' @inheritParams u_ewp
 #' @param details A list of details to be requested from
 #' `baskwrap::get_details.fujikawa_x` (will be supplied to the function as
 #' the `which_details` argument).
