@@ -36,6 +36,8 @@ u_2pow(
 \item{detail_params}{A named list of parameters that need to be supplied to
 \code{get_details()}.}
 
+\item{p1}{A numeric, response scenario for calculating power and error rate.}
+
 \item{penalty1}{A numeric, \code{penalty1} is the penalty for low FWER,}
 
 \item{penalty2}{A numeric, \code{penalty1 + penalty2} is the penalty for high
@@ -43,6 +45,9 @@ FWER.}
 
 \item{threshold}{A numeric, for high FWER above this threshold we impose a
 harsher penalty.}
+
+\item{report_details}{A logical, if \code{TRUE}, the function returns the output
+of the implicit call to \code{baskwrap::get_details()} as \code{attr(, "details")}.}
 }
 \value{
 A numeric, the parameter combination's utility.

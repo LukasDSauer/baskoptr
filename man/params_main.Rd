@@ -11,6 +11,9 @@
 
 \item{detail_params}{A named list of parameters that need to be supplied to
 \code{get_details()}.}
+
+\item{report_details}{A logical, if \code{TRUE}, the function returns the output
+of the implicit call to \code{baskwrap::get_details()} as \code{attr(, "details")}.}
 }
 \description{
 List of parameters used across the package

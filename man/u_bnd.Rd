@@ -34,6 +34,9 @@ supplied to  the utility function.}
 \item{lower}{numerical, a vector of lower bounds of the parameters.}
 
 \item{upper}{numerical, a vector of upper bounds of the parameters.}
+
+\item{report_details}{A logical, if \code{TRUE}, the function returns the output
+of the implicit call to \code{baskwrap::get_details()} as \code{attr(, "details")}.}
 }
 \value{
 A numeric, the parameter combination's utility.

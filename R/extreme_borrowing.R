@@ -45,11 +45,9 @@
 #' epsilon_extreme(design, tau = 0.5, detail_params)
 #' tau_extreme(design, epsilon = 2, detail_params)
 epsilon_extreme <- function(design, tau, detail_params){
-  jsd_mat <- basksim:::get_weights_jsd(design,
-                                      n = detail_params$n,
-                                      epsilon = 1,
-                                      tau = 0,
-                                      logbase = detail_params$logbase)
+  jsd_mat <- baskwrap::weights_fujikawa_vanilla(design,
+                                                n = detail_params$n,
+                                                logbase = detail_params$logbase)
   # ignore the diagonal, as it concerns the case k = l and were are only
   # interested in k neq l.
   for(i in (1:(detail_params$n+1))){
@@ -61,11 +59,9 @@ epsilon_extreme <- function(design, tau, detail_params){
 #' @rdname epsilon_extreme
 #' @export
 tau_extreme <- function(design, epsilon, detail_params){
-  jsd_mat <- basksim:::get_weights_jsd(design,
-                                       n = detail_params$n,
-                                       epsilon = 1,
-                                       tau = 0,
-                                       logbase = detail_params$logbase)
+  jsd_mat <- baskwrap::weights_fujikawa_vanilla(design,
+                                         n = detail_params$n,
+                                         logbase = detail_params$logbase)
   for(i in (1:(detail_params$n+1))){
     jsd_mat[i, i] <- -1
   }

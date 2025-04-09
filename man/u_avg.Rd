@@ -41,6 +41,9 @@ response rates under the alternative hypothesis.}
 \item{weights_u}{A numeric vector of weights for calculating the weighted
 average.}
 
+\item{report_details}{A logical, if \code{TRUE}, the function returns the output
+of the implicit call to \code{baskwrap::get_details()} as \code{attr(, "details")}.}
+
 \item{penalty_maxtoer}{A numeric, the penalty for punishing the maximal TOER across
 all considered scenarios and all strata.}
 

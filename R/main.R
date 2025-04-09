@@ -6,6 +6,8 @@
 #' @param x  A named list, the design's tuning parameters to be optimized.
 #' @param detail_params A named list of parameters that need to be supplied to
 #' `get_details()`.
+#' @param report_details A logical, if `TRUE`, the function returns the output
+#' of the implicit call to `baskwrap::get_details()` as `attr(, "details")`.
 NULL
 
 #'  List of parameters used for functions calling utility functions

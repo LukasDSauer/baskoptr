@@ -33,8 +33,6 @@
 #' @param threshold A numeric, for high FWER above this threshold we impose a
 #' penalty, default: 0.1.
 #' @param penalty A numeric, the scaling factor for FWER penalty, default: 1.
-#' @param report_details A logical, if `TRUE`, the function returns the output
-#' of the implicit call to `baskwrap::get_details()` as `attr(, "details")`.
 #' @param reduce_calculations A logical, only takes effect for the
 #' `"exact"` backend. If `TRUE`, the function will only execute the
 #' `get_details()` function for `p1` if the FWER for `p2` turned out
@@ -171,45 +169,6 @@ u_ecd <- function(design, x, detail_params, p1 = NULL,
   return(u_result)
 }
 
-#' Internal helper function: Get details for two response scenarios
-#'
-#' @inheritParams u_ewp
-#' @param which_details_list  A list of two lists, `which_details_list[["p1"]]`
-#' and `which_details_list[["p2"]]`, containing the details which are to
-#' be requested for `p1` and `p2`, respectively.
-#' @return A list of two lists containing return values of `get_details` calls.
-get_details_for_two_scenarios <- function(design, x, detail_params, p1, p2,
-                                          which_details_list){
-  detail_params <- io_val_p1(detail_params, p1)
-  if(!which_details_list == "all"){
-    # The following line is currently not in use
-    # nocov start
-    detail_params <- append_details(detail_params, "which_details",
-                                     further = which_details_list[["p1"]])
-    # nocov end
-  }
-  details_p1 <- do.call(baskwrap::get_details,
-                      c(design = list(design),
-                        as.list(x),
-                        detail_params
-                        ))
-
-  # Calculate details under p2
-  detail_params$p1 <- p2
-  if(!which_details_list == "all"){
-    # The following line is currently not in use
-    # nocov start
-    detail_params <- append_details(detail_params, "which_details",
-                                     further = which_details_list[["p2"]])
-    # nocov end
-  }
-  details_p2 <- do.call(baskwrap::get_details,
-                      c(design = list(design),
-                        as.list(x),
-                        detail_params))
-  return(list(p1 = details_p1,
-              p2 = details_p2))
-}
 
 #' Utility functions: Two-level power-error combination functions
 #'
@@ -232,6 +191,7 @@ get_details_for_two_scenarios <- function(design, x, detail_params, p1, p2,
 #' where \eqn{R} and \eqn{R^c} are the sets of active and inactive strata, respectively.
 #'
 #' @inheritParams params_main
+#' @param p1 A numeric, response scenario for calculating power and error rate.
 #' @param penalty1 A numeric, `penalty1` is the penalty for low FWER,
 #' @param penalty2 A numeric, `penalty1 + penalty2` is the penalty for high
 #' FWER.
@@ -507,42 +467,4 @@ u_bnd <-
     }
   }
 
-#' Internal helper function: Append and set elements of a details list
-#'
-#' `append_details` takes the element `details[["index"]]` and appends it with
-#' the list `further`. `set_details` takes the element `details[["index"]]` and
-#' sets it to `value`.
-#'
-#' @inheritParams u_ewp
-#' @param index  Indicates which element of `details` should be appended.
-#' @param further  A list of further parameters to be appended.
-#' @return The updated list of `details`.
-append_details <- function(details, index, further){
-  details[[index]] <- c(details[[index]], further)
-  return(details)
-}
-#' @rdname append_details
-set_details <- function(details, index, value){
-  details[[index]] <- value
-  return(details)
-}
 
-
-#' Internal helper function: Input validation for p1
-#'
-#' Returns `detail_params` with checked element `detail_params$p1 <- p1`,
-#' depending on whether `p1` is not `NULL` or `detail_params$p1` is not `NULL`.
-#' Returns an error message if both are NULL.
-#'
-#' @inheritParams u_ewp
-#'
-#' @return The updated list of `detail_params`.
-io_val_p1 <- function(detail_params, p1){
-  # Calculate details under p1
-  if(!is.null(p1)){
-    detail_params$p1 <- p1
-  } else if(is.null(detail_params$p1)){
-    stop("You must supply either p1 or detail_params$p1!")
-  }
-  return(detail_params)
-}
