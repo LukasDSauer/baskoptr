@@ -165,11 +165,19 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
             algorithm_params)
   names(args)[[1]] <- fn_name
   res <- do.call(algorithm, args)
-  res_named <- res$par
-  names(res_named) <- x_names
   if(!is.null(format_result)){
     res <- format_result(res)
   }
+  res_named <- tryCatch(res$par,
+                        error = function(e){
+  stop(
+"opt_design_gen() received the following error message while calling the
+ optimization algorithm's result object. Perhaps the algorithm does not
+ return its output in the format res = list(par = ..., value = ...). Supply
+ a custom format function in format_result for formatting the result object.
+ Original error message:\n", e, "\nResult object:\n", res)
+                        })
+  names(res_named) <- x_names
   if(trace_rec %in% c("return", "return and save")){
     if(!is.null(res[["trace"]])){
       res[["trace_alg"]] <- res[["trace"]]
@@ -187,6 +195,9 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
                                        final_details_utility_params))
     attr(res, "final_details") <- attr(res_repeated, "details")
     attributes(res_repeated) <- NULL
+    if(!is.null(format_result)){
+      res_repeated <- format_result(res_repeated)
+    }
     attr(res, "final_res_repeated") <- res_repeated
   }
   return(res)
