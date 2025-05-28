@@ -28,7 +28,9 @@
 #' `NULL`) and request the trace directly from your algorithm using
 #' `algorith_params`.
 #' @param format_result (Optional:) A function `function(res)` for formatting
-#' the final output of the optimization algorithm.
+#' the final output of the optimization algorithm. If you want
+#' `final_details = TRUE`, then the formatted result must have a non-null element
+#' `res$par` containing the optimal parameters.
 #' @param final_details A logical, if `TRUE`, the function runs the
 #' utility function one more time on the optimization result and returns the
 #' output of the implicit call to `baskwrap::get_details()` as
@@ -102,8 +104,8 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
       x_names <- names(algorithm_params$par)
     } else {
       stop("Cannot retrieve parameter vector names from algorithm_params and
-          x_names is NULL. Please supply an x_names argument or
-          algorithm_params$par or algorithm_params$lower.")
+x_names is NULL. Please supply an x_names argument or
+algorithm_params$par or algorithm_params$lower.")
     }
   }
   if(!is.null(utility_params$detail_params)){
@@ -168,37 +170,54 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
   if(!is.null(format_result)){
     res <- format_result(res)
   }
-  res_named <- tryCatch(res$par,
-                        error = function(e){
-  stop(
-"opt_design_gen() received the following error message while calling the
- optimization algorithm's result object. Perhaps the algorithm does not
- return its output in the format res = list(par = ..., value = ...). Supply
- a custom format function in format_result for formatting the result object.
- Original error message:\n", e, "\nResult object:\n", res)
-                        })
-  names(res_named) <- x_names
   if(trace_rec %in% c("return", "return and save")){
-    if(!is.null(res[["trace"]])){
-      res[["trace_alg"]] <- res[["trace"]]
+    if(is.list(res)){
+      if(!is.null(res[["trace"]])){
+        res[["trace_alg"]] <- res[["trace"]]
+      }
+      res[["trace"]] <- readRDS(trace_path)
+    } else {
+      warning("opt_design_gen() could not save the trace as you requested.
+For saving the trace, the algorithm's result must be returned as a list.
+Supply a custom format function in format_result for formatting the result
+as a list, ideally in the format res = list(par = ..., value = ...) with
+`par` being the optimal parameter values and `value` being the utility
+function's optimal value.")
     }
-    res[["trace"]] <- readRDS(trace_path)
   }
   if(trace_rec == "return"){
     file.remove(trace_path)
   }
   if(final_details){
-    final_details_utility_params$report_details <- TRUE
-    res_repeated <- do.call(utility, c(design = list(design),
-                                       x = list(res_named),
-                                       detail_params = list(detail_params),
-                                       final_details_utility_params))
-    attr(res, "final_details") <- attr(res_repeated, "details")
-    attributes(res_repeated) <- NULL
-    if(!is.null(format_result)){
-      res_repeated <- format_result(res_repeated)
-    }
-    attr(res, "final_res_repeated") <- res_repeated
+    tryCatch({
+      res_named <- res$par
+        names(res_named) <- x_names
+        final_details_utility_params$report_details <- TRUE
+        res_repeated <- do.call(utility, c(design = list(design),
+                                           x = list(res_named),
+                                           detail_params = list(detail_params),
+                                           final_details_utility_params))
+        attr(res, "final_details") <- attr(res_repeated, "details")
+        attributes(res_repeated) <- NULL
+        if(!is.null(format_result)){
+          res_repeated <- format_result(res_repeated)
+        }
+        attr(res, "final_res_repeated") <- res_repeated
+      },
+      error = function(e){
+        err_message <- as.character(e)
+        if(err_message == "Error in res$par: $ operator is invalid for atomic vectors\n"){
+          warning("opt_design_gen() could not generate the final_details attribute requested.
+It received the error message shown below while calling
+`res$par` for the optimization algorithm's result object res. Perhaps the algorithm
+does not return its output in the format res = list(par = ..., value = ...).
+Supply a custom format function in format_result for formatting the result object
+so that its optimal parameters are saved as res$par.
+Original error message:\n", e)
+          } else {
+            stop("Error while generating final_detail in opt_design_gen().\nOriginal error message:\n", e)
+          }
+    })
   }
   return(res)
 }

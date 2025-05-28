@@ -168,12 +168,90 @@ test_that("grid search can retrieve parameter names, trace can be switched
                                                          tau = 0.49),
                                                 control = alg_control),
                         trace = "none",
-                        format_result = format_fun,
-                        final_details = TRUE)
+                        format_result = format_fun)
   expect_equal(res, c(opt_ref, value = val_ref), ignore_attr = T)
-  expect_equal(attr(res, "final_details")$p1$Rejection_Probabilities,
-               details$Rejection_Probabilities)
 })
+
+test_that("if trace is switched on but format_fun formats without res$par,
+a warning is dropped and trace is switched off.", {
+  format_fun <- function(res) {
+   return(c(res[["par"]], value = res[["value"]]))
+  }
+  expect_warning({res <- opt_design_gen(design = design4,
+                       utility = u_2pow,
+                       algorithm = optimizr::gridsearch,
+                       detail_params = NULL,
+                       utility_params = list(detail_params = detail_params_fuj,
+                                             p1 = p1_high,
+                                             threshold = threshold,
+                                             penalty1 = penalty1,
+                                             penalty2 = penalty2),
+                       algorithm_params = list(lower = c(lambda = 0.1,
+                                                         epsilon = 1,
+                                                         tau = 0.01),
+                                               upper = c(lambda = 0.99,
+                                                         epsilon = 2,
+                                                         tau = 0.5),
+                                               step = c(lambda = 0.89,
+                                                        epsilon = 1,
+                                                        tau = 0.49),
+                                               control = alg_control),
+                       trace = TRUE,
+                       format_result = format_fun)})
+  expect_equal(res, c(opt_ref, value = val_ref), ignore_attr = T)
+})
+
+test_that("algorithms with wrong format do not return final details or trace,
+but return the correct result", {
+             format_fun <- function(res) {
+               return(c(res[["par"]], value = res[["value"]]))
+             }
+             expect_warning({res_nofin <- opt_design_gen(design = design4,
+                                   utility = u_2pow,
+                                   algorithm = optimizr::gridsearch,
+                                   detail_params = NULL,
+                                   utility_params = list(detail_params = detail_params_fuj,
+                                                         p1 = p1_high,
+                                                         threshold = threshold,
+                                                         penalty1 = penalty1,
+                                                         penalty2 = penalty2),
+                                   algorithm_params = list(lower = c(lambda = 0.1,
+                                                                     epsilon = 1,
+                                                                     tau = 0.01),
+                                                           upper = c(lambda = 0.99,
+                                                                     epsilon = 2,
+                                                                     tau = 0.5),
+                                                           step = c(lambda = 0.89,
+                                                                    epsilon = 1,
+                                                                    tau = 0.49),
+                                                           control = alg_control),
+                                   trace = "none",
+                                   format_result = format_fun,
+                                   final_details = TRUE)})
+             expect_warning({res_notra <- opt_design_gen(design = design4,
+                                                         utility = u_2pow,
+                                                         algorithm = optimizr::gridsearch,
+                                                         detail_params = NULL,
+                                                         utility_params = list(detail_params = detail_params_fuj,
+                                                                               p1 = p1_high,
+                                                                               threshold = threshold,
+                                                                               penalty1 = penalty1,
+                                                                               penalty2 = penalty2),
+                                                         algorithm_params = list(lower = c(lambda = 0.1,
+                                                                                           epsilon = 1,
+                                                                                           tau = 0.01),
+                                                                                 upper = c(lambda = 0.99,
+                                                                                           epsilon = 2,
+                                                                                           tau = 0.5),
+                                                                                 step = c(lambda = 0.89,
+                                                                                          epsilon = 1,
+                                                                                          tau = 0.49),
+                                                                                 control = alg_control),
+                                                         trace = "return",
+                                                         format_result = format_fun,
+                                                         final_details = FALSE)})
+             expect_equal(res_nofin, c(opt_ref, value = val_ref), ignore_attr = T)
+           })
 
 test_that("simulated annealing can retrieve parameter names, trace recorded by
           algorithm is saved in trace_alg if trace is also recorded by
@@ -188,14 +266,15 @@ test_that("simulated annealing can retrieve parameter names, trace recorded by
                                         shape2 = 1,
                                         p0 = p0,
                                         backend = "exact")
+  utility_params <- list(p1 = p1,
+                         threshold = threshold,
+                         penalty = penalty)
   res <- progressr::with_progress({
     opt_design_gen(design = design3,
                    utility = u_ewp,
                    algorithm = optimizr::simann,
                    detail_params = detail_params_fuj,
-                   utility_params = list(p1 = p1,
-                                         threshold = threshold,
-                                         penalty = penalty),
+                   utility_params = utility_params,
                    algorithm_params = list(par = c(lambda = 0.9,
                                                    epsilon = 1,
                                                    tau = 0.5),
@@ -205,7 +284,12 @@ test_that("simulated annealing can retrieve parameter names, trace recorded by
                                                           fnscale = -1,
                                                           REPORT = 1)),
                    trace = TRUE,
-                   progress_bar = 10 + 2)})
+                   progress_bar = 10 + 2,
+                   final_details = TRUE,
+                   final_details_utility_params = c(utility_params,
+                                                    reduce_calculations =
+                                                      FALSE)
+                   )})
   details_p0 <- baskwrap::get_details(design3,
                                    n = detail_params_fuj$n,
                                    p1 = rep(p0, design3$k),
@@ -227,6 +311,10 @@ test_that("simulated annealing can retrieve parameter names, trace recorded by
   } else {
     expect_equal(-details_p0$FWER*penalty, res$value)
   }
+  expect_equal(attr(res, "final_details")$p2$Rejection_Probabilities,
+               details_p0$Rejection_Probabilities)
+  expect_equal(attr(res, "final_details")$p1$Rejection_Probabilities,
+               details_p1$Rejection_Probabilities)
   expect_equal(nrow(res$trace), 12)
   expect_equal(nrow(res$trace_alg), 10)
   expect_true(all(res$value >= res$trace$fn))

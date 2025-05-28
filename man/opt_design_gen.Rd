@@ -61,7 +61,9 @@ trace. In that case, you can switch off using \code{trace = FALSE} (or \code{""}
 \code{algorith_params}.}
 
 \item{format_result}{(Optional:) A function \verb{function(res)} for formatting
-the final output of the optimization algorithm.}
+the final output of the optimization algorithm. If you want
+\code{final_details = TRUE}, then the formatted result must have a non-null element
+\code{res$par} containing the optimal parameters.}
 
 \item{final_details}{A logical, if \code{TRUE}, the function runs the
 utility function one more time on the optimization result and returns the
