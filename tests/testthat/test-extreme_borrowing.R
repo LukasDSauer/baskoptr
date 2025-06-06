@@ -4,17 +4,17 @@ test_that("extreme borrowing cutoff is plausible", {
   tau <- 0.5
   p1 <- c(design4$p0, design4$p0, 0.5, 0.5)
   eps_ex <- epsilon_extreme(design4, tau = 0.5, detail_params)
-  mat_eps_ex <- baskwrap::weights_fujikawa_x(design4,
+  mat_eps_ex <- baskwrap::weights_jsd(design4,
                         n = detail_params$n,
                         logbase = detail_params$logbase,
                         epsilon = eps_ex,
                         tau = tau)
-  mat_gt_eps_ex <- baskwrap::weights_fujikawa_x(design4,
+  mat_gt_eps_ex <- baskwrap::weights_jsd(design4,
                                              n = detail_params$n,
                                              logbase = detail_params$logbase,
                                              epsilon = eps_ex + 0.5,
                                              tau = tau)
-  mat_lt_eps_ex <- baskwrap::weights_fujikawa_x(design4,
+  mat_lt_eps_ex <- baskwrap::weights_jsd(design4,
                                                 n = detail_params$n,
                                                 logbase = detail_params$logbase,
                                                 epsilon = eps_ex - 0.5,
