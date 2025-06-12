@@ -45,7 +45,7 @@
 #' epsilon_extreme(design, tau = 0.5, detail_params)
 #' tau_extreme(design, epsilon = 2, detail_params)
 epsilon_extreme <- function(design, tau, detail_params){
-  jsd_mat <- baskwrap::weights_fujikawa_vanilla(design,
+  jsd_mat <- baskwrap::weights_jsd_vanilla(design,
                                                 n = detail_params$n,
                                                 logbase = detail_params$logbase)
   # ignore the diagonal, as it concerns the case k = l and were are only
@@ -59,7 +59,7 @@ epsilon_extreme <- function(design, tau, detail_params){
 #' @rdname epsilon_extreme
 #' @export
 tau_extreme <- function(design, epsilon, detail_params){
-  jsd_mat <- baskwrap::weights_fujikawa_vanilla(design,
+  jsd_mat <- baskwrap::weights_jsd_vanilla(design,
                                          n = detail_params$n,
                                          logbase = detail_params$logbase)
   for(i in (1:(detail_params$n+1))){
