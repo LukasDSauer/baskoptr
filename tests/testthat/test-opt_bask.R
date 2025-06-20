@@ -25,6 +25,10 @@ val_ref <- details$Rejection_Probabilities[3] +
   penalty2*(details$Rejection_Probabilities[1] +
               details$Rejection_Probabilities[2] -
               2*threshold)
+format_fun <- function(res) {
+  return(c(res[["par"]], value = res[["value"]]))
+}
+
 test_that("grid search on small grid with u_2pow() works", {
   axes <- list(lambda = c(0.1, 0.99),
                epsilon = c(1, 2),
@@ -145,9 +149,7 @@ test_that("trace options work", {
 
 test_that("grid search can retrieve parameter names, trace can be switched
            off, output can be manually formatted", {
-  format_fun <- function(res) {
-      return(c(res[["par"]], value = res[["value"]]))
-    }
+
   res <- opt_design_gen(design = design4,
                         utility = u_2pow,
                         algorithm = optimizr::gridsearch,
@@ -174,9 +176,6 @@ test_that("grid search can retrieve parameter names, trace can be switched
 
 test_that("if trace is switched on but format_fun formats without res$par,
 a warning is dropped and trace is switched off.", {
-  format_fun <- function(res) {
-   return(c(res[["par"]], value = res[["value"]]))
-  }
   expect_warning({res <- opt_design_gen(design = design4,
                        utility = u_2pow,
                        algorithm = optimizr::gridsearch,
@@ -203,9 +202,6 @@ a warning is dropped and trace is switched off.", {
 
 test_that("algorithms with wrong format do not return final details or trace,
 but return the correct result", {
-             format_fun <- function(res) {
-               return(c(res[["par"]], value = res[["value"]]))
-             }
              expect_warning({res_nofin <- opt_design_gen(design = design4,
                                    utility = u_2pow,
                                    algorithm = optimizr::gridsearch,

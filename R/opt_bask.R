@@ -27,6 +27,10 @@
 #' trace. In that case, you can switch off using `trace = FALSE` (or `""` or
 #' `NULL`) and request the trace directly from your algorithm using
 #' `algorith_params`.
+#' @param trace_options A list, if `trace_options = list(robust = TRUE)`, a
+#' robust recording method for saving the optimization steps is used that works
+#' well with parallelized algorithms. Caveat: the robust version is not sorted
+#' in chronological order.
 #' @param format_result (Optional:) A function `function(res)` for formatting
 #' the final output of the optimization algorithm. If you want
 #' `final_details = TRUE`, then the formatted result must have a non-null element
@@ -93,6 +97,7 @@ opt_design_gen <- function(design, utility, algorithm, detail_params,
                            utility_params, algorithm_params,
                            x_names = NULL, fn_name = "fn",
                            trace = FALSE,
+                           trace_options = list(robust = FALSE),
                            format_result = NULL,
                            final_details = FALSE,
                            final_details_utility_params = utility_params,
@@ -137,10 +142,28 @@ algorithm_params$par or algorithm_params$lower.")
                          detail_params = list(detail_params),
                          utility_params)))}
   } else if(trace_rec == "return" | trace_rec == "return and save"){
-    if(!file.exists(trace_path)){
-      file.create(trace_path)
+    if(trace_options$robust){
+      trace_temp <- paste0("opt_design_gen_trace_",
+                           ceiling(runif(1, 1, 10000000)))
+      trace_temp_files_wildcard <- paste0(tempdir(), "\\", trace_temp, "*")
+      # Delete anything available under wildcard (shouldn't be anything)
+      unlink(trace_temp_files_wildcard)
+      # Delete everything at the end
+      on.exit(unlink(trace_temp_files_wildcard), add = TRUE)
+      trace_handler <- function(trace_row){
+        saveRDS(data.frame(trace_row),
+                tempfile(trace_temp, fileext = ".RDS"))
+      }
+    } else {
+      if(!file.exists(trace_path)){
+        file.create(trace_path)
+      }
+      saveRDS(NULL, trace_path)
+      trace_handler <- function(trace_row){
+        alg_trace <- readRDS(trace_path)
+        saveRDS(rbind(alg_trace, trace_row), trace_path)
+      }
     }
-    saveRDS(NULL, trace_path)
     u_fun <- function(x){
       x_named <- x
       names(x_named) <- x_names
@@ -150,12 +173,7 @@ algorithm_params$par or algorithm_params$lower.")
                                x = list(x_named),
                                detail_params = list(detail_params),
                                utility_params))
-      alg_trace <- readRDS(trace_path)
-      saveRDS(rbind(alg_trace,
-                    data.frame(cbind(t(x_named),
-                                     fn,
-                                     t(seed)))),
-              trace_path)
+      trace_handler(trace_row = data.frame(cbind(t(x_named), fn, t(seed))))
       # Make progress update if requested
       if(!is.null(progress_bar)){
         progress_bar()
@@ -175,18 +193,30 @@ algorithm_params$par or algorithm_params$lower.")
       if(!is.null(res[["trace"]])){
         res[["trace_alg"]] <- res[["trace"]]
       }
-      res[["trace"]] <- readRDS(trace_path)
+      if(trace_options$robust){
+        # Read the temporary trace files
+        res[["trace"]] <- do.call(rbind,
+                                  lapply(list.files(tempdir(), trace_temp,
+                                                    full.names = TRUE),
+                                         readRDS))
+        res[["trace"]] <- res[["trace"]][do.call(order, res[["trace"]]),]
+        if(trace_rec == "return and save"){
+          saveRDS(res[["trace"]], trace_path)
+        }
+      } else {
+        res[["trace"]] <- readRDS(trace_path)
+        if(trace_rec == "return"){
+          file.remove(trace_path)
+        }
+      }
     } else {
-      warning("opt_design_gen() could not save the trace as you requested.
+      warning("opt_design_gen() could not return the trace as you requested.
 For saving the trace, the algorithm's result must be returned as a list.
 Supply a custom format function in format_result for formatting the result
 as a list, ideally in the format res = list(par = ..., value = ...) with
 `par` being the optimal parameter values and `value` being the utility
 function's optimal value.")
     }
-  }
-  if(trace_rec == "return"){
-    file.remove(trace_path)
   }
   if(final_details){
     tryCatch({
