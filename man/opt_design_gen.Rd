@@ -14,6 +14,7 @@ opt_design_gen(
   x_names = NULL,
   fn_name = "fn",
   trace = FALSE,
+  trace_options = list(robust = FALSE),
   format_result = NULL,
   final_details = FALSE,
   final_details_utility_params = utility_params,
@@ -59,6 +60,11 @@ Some optimization algorithms automatically return their
 trace. In that case, you can switch off using \code{trace = FALSE} (or \code{""} or
 \code{NULL}) and request the trace directly from your algorithm using
 \code{algorith_params}.}
+
+\item{trace_options}{A list, if \code{trace_options = list(robust = TRUE)}, a
+robust recording method for saving the optimization steps is used that works
+well with parallelized algorithms. Caveat: the robust version is not sorted
+in chronological order.}
 
 \item{format_result}{(Optional:) A function \verb{function(res)} for formatting
 the final output of the optimization algorithm. If you want

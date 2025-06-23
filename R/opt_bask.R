@@ -143,13 +143,16 @@ algorithm_params$par or algorithm_params$lower.")
                          utility_params)))}
   } else if(trace_rec == "return" | trace_rec == "return and save"){
     if(trace_options$robust){
+      # Generate hopefully unique name for the temporary files.
       trace_temp <- paste0("opt_design_gen_trace_",
-                           ceiling(runif(1, 1, 10000000)))
+                           ceiling(stats::runif(1, 1, 10000000)))
       trace_temp_files_wildcard <- paste0(tempdir(), "\\", trace_temp, "*")
-      # Delete anything available under wildcard (shouldn't be anything)
+      # Delete anything temp files under this name (shouldn't be any)
       unlink(trace_temp_files_wildcard)
-      # Delete everything at the end
+      # Delete all temp files after function execution
       on.exit(unlink(trace_temp_files_wildcard), add = TRUE)
+      # Robust trace handling: Save every stop in a separate temp file and
+      # and combine these files at the end.
       trace_handler <- function(trace_row){
         saveRDS(data.frame(trace_row),
                 tempfile(trace_temp, fileext = ".RDS"))
@@ -159,6 +162,7 @@ algorithm_params$par or algorithm_params$lower.")
         file.create(trace_path)
       }
       saveRDS(NULL, trace_path)
+      # Simple trace handling: Save every stop in the same file.
       trace_handler <- function(trace_row){
         alg_trace <- readRDS(trace_path)
         saveRDS(rbind(alg_trace, trace_row), trace_path)

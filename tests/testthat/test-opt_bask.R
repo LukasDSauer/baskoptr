@@ -17,7 +17,6 @@ details <- baskwrap::get_details(design4,
                                  epsilon = opt_ref["epsilon"],
                                  tau = opt_ref["tau"],
                                  logbase = logbase)
-
 val_ref <- details$Rejection_Probabilities[3] +
   details$Rejection_Probabilities[4] -
   penalty1*(details$Rejection_Probabilities[1] +
@@ -25,6 +24,7 @@ val_ref <- details$Rejection_Probabilities[3] +
   penalty2*(details$Rejection_Probabilities[1] +
               details$Rejection_Probabilities[2] -
               2*threshold)
+# Custom function for formatting the optimization algorithm's result
 format_fun <- function(res) {
   return(c(res[["par"]], value = res[["value"]]))
 }
