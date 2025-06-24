@@ -146,7 +146,8 @@ algorithm_params$par or algorithm_params$lower.")
       # Generate hopefully unique name for the temporary files.
       trace_temp <- paste0("opt_design_gen_trace_",
                            ceiling(stats::runif(1, 1, 10000000)))
-      trace_temp_files_wildcard <- paste0(tempdir(), "\\", trace_temp, "*")
+      tempdir_path <- tempdir()
+      trace_temp_files_wildcard <- paste0(tempdir_path, "\\", trace_temp, "*")
       # Delete anything temp files under this name (shouldn't be any)
       unlink(trace_temp_files_wildcard)
       # Delete all temp files after function execution
@@ -155,7 +156,7 @@ algorithm_params$par or algorithm_params$lower.")
       # and combine these files at the end.
       trace_handler <- function(trace_row){
         saveRDS(data.frame(trace_row),
-                tempfile(trace_temp, fileext = ".RDS"))
+                tempfile(trace_temp, tmpdir = tempdir_path, fileext = ".RDS"))
       }
     } else {
       if(!file.exists(trace_path)){
@@ -200,7 +201,7 @@ algorithm_params$par or algorithm_params$lower.")
       if(trace_options$robust){
         # Read the temporary trace files
         res[["trace"]] <- do.call(rbind,
-                                  lapply(list.files(tempdir(), trace_temp,
+                                  lapply(list.files(tempdir_path, trace_temp,
                                                     full.names = TRUE),
                                          readRDS))
         res[["trace"]] <- res[["trace"]][do.call(order, res[["trace"]]),]
