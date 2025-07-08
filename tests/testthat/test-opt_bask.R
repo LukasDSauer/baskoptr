@@ -84,6 +84,7 @@ test_that("trace options work", {
                         trace = NULL)
   expect_true(is.null(res$trace))
   # Returning trace.
+  set.seed(529)
   res <- opt_design_gen(design = design4,
                         utility = u_2pow,
                         algorithm = optimizr::gridsearch,
@@ -97,8 +98,25 @@ test_that("trace options work", {
                                                 control = alg_control),
                         x_names = c("lambda", "epsilon", "tau"),
                         trace = "return")
+  set.seed(529)
+  res_robust <- opt_design_gen(design = design4,
+                        utility = u_2pow,
+                        algorithm = optimizr::gridsearch,
+                        detail_params = NULL,
+                        utility_params = list(detail_params = detail_params_fuj,
+                                              p1 = p1_high,
+                                              threshold = threshold,
+                                              penalty1 = penalty1,
+                                              penalty2 = penalty2),
+                        algorithm_params = list(grid = grid,
+                                                control = alg_control),
+                        x_names = c("lambda", "epsilon", "tau"),
+                        trace = "return",
+                        trace_options = list(robust = TRUE))
   expect_equal(res$trace$lambda, grid$lambda)
   expect_equal(res$trace$epsilon, grid$epsilon)
+  expect_equal(res$trace[c("lambda", "epsilon", "tau", "fn"), ],
+               res_robust$trace[c("lambda", "epsilon", "tau", "fn"), ])
   # Saving trace to custom path.
   trace_path <- test_path(path_refdata_rel, "ref_trace.RDS")
   expect_false(file.exists(trace_path))
