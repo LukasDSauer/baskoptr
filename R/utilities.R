@@ -75,7 +75,8 @@ u_ewp <- function(design, x, detail_params, p1 = NULL,
     }
     details_list <- get_details_for_two_scenarios(design, x, detail_params, p1,
                                                   p2, which_details_list =
-                                                    "all")
+                                                    list(p1 = list("EWP"),
+                                                         p2 = list("FWER")))
 
     ewp <-
       details_list[["p1"]]$EWP
@@ -98,6 +99,7 @@ u_ewp <- function(design, x, detail_params, p1 = NULL,
     if (fwer >= threshold) {
       u_result <- -fwer*penalty
     } else{
+
       detail_params <- io_val_p1(detail_params, p1)
       details_list[["p1"]] <- do.call(baskwrap::get_details,
                          c(design = list(design),
@@ -131,7 +133,8 @@ u_ecd <- function(design, x, detail_params, p1 = NULL,
     details_list <- get_details_for_two_scenarios(design, x, detail_params, p1,
                                                   p2,
                                                   which_details_list =
-                                                    "all")
+                                                    list(p1 = list("ECD"),
+                                                         p2 = list("FWER")))
     ecd <-
       details_list[["p1"]]$ECD
     fwer <-

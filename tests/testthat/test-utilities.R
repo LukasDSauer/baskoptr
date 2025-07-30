@@ -1,20 +1,4 @@
-test_that("u_avg() returns an error message if used with  u_ewp(),
-          reduce_calculations == FALSE and 'exact' backend", {
-  design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
-                                       p0 = 0.2, backend = "exact")
-  x <- list(lambda = 0.99, epsilon = 2, tau = 0.5)
-  detail_params <- list(n = 20,
-                        weight_fun = baskexact::weights_fujikawa,
-                        logbase = exp(1))
-  expect_error(u_avg(design,
-                     x = x,
-                     detail_params = detail_params,
-                     utility = u_ewp,
-                     utility_params = list(penalty = 1, threshold = 0.1),
-                     p1s = p1s,
-                     penalty_maxtoer = 1, threshold_maxtoer = 0.1
-                     ))
-})
+
 test_that("u_ewp() delivers the expected results", {
   set.seed(123)
   penalty <- 3
@@ -266,6 +250,9 @@ test_that("u_avg() delivers the expected results", {
   utility_params_2ewp <- list(penalty1 = penalty1_2ewp,
                               penalty2 = penalty2_2ewp,
                               threshold = threshold_2ewp)
+  utility_params_ewp <- list(penalty = penalty1_2ewp,
+                             threshold = threshold_2ewp,
+                             reduce_calculations = FALSE)
   u_ref <- (u_vconservative_2ewp_null + u_vconservative_2ewp)/2
   u_val <- u_avg(design = design4,
                 x = x_fuj_vconservative,
@@ -289,6 +276,17 @@ test_that("u_avg() delivers the expected results", {
                          penalty_maxtoer = 1000,
                          report_details = TRUE,
                          use_future = TRUE)
+  u_val_ewp <- u_avg(design = design3,
+                     x = x_fuj_vconservative,
+                     detail_params = detail_params_fuj,
+                     utility = u_ewp,
+                     utility_params = utility_params_ewp,
+                     p1s = rbind(c(0.2,0.2,0.2), c(0.2,0.2,0.5),
+                                 c(0.2,0.5,0.5), c(0.5,0.5,0.5)),
+                     threshold_maxtoer = 0.07,
+                     penalty_maxtoer = 1000,
+                     report_details = TRUE,
+                     use_future = TRUE)
   # Expecting error because only threshold_maxtoer was supplied without penalty.
   expect_error({u_avg(design = design4,
                  x = x_fuj_vconservative,
@@ -322,6 +320,29 @@ test_that("u_avg() delivers the expected results", {
   expect_equal(u_val_sim, u_ref, ignore_attr = T, tolerance = 0.05)
   expect_equal(attr(u_val_maxtoer, "details")$`c(0.1, 0.1, 0.1, 0.1)`$p1$FWER,
                details_vconservative_null$FWER)
+  expect_true(attr(u_val_ewp, "details")$`c(0.2, 0.2, 0.2)`$p2$FWER <
+                threshold_2ewp)
+  expect_equal((attr(u_val_ewp, "details")$`c(0.2, 0.2, 0.2)`$p1$EWP +
+                attr(u_val_ewp, "details")$`c(0.2, 0.2, 0.5)`$p1$EWP +
+                attr(u_val_ewp, "details")$`c(0.2, 0.5, 0.5)`$p1$EWP +
+                attr(u_val_ewp, "details")$`c(0.5, 0.5, 0.5)`$p1$EWP) / 4,
+               as.numeric(u_val_ewp))
+})
+
+test_that("u_avg() returns an error message if used with  u_ewp(),
+          reduce_calculations == FALSE and 'exact' backend", {
+  x <- list(lambda = 0.99, epsilon = 2, tau = 0.5)
+  detail_params <- list(n = 20,
+                        weight_fun = baskexact::weights_fujikawa,
+                        logbase = exp(1))
+  expect_error(u_avg(design3,
+                     x = x,
+                     detail_params = detail_params,
+                     utility = u_ewp,
+                     utility_params = list(penalty = 1, threshold = 0.1),
+                     p1s = p1s,
+                     penalty_maxtoer = 1, threshold_maxtoer = 0.1
+  ))
 })
 
 test_that("u_bnd() delivers the expected results", {

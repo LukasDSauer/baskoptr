@@ -1,5 +1,7 @@
 # GENERAL PARAMETERS IN THE TESTS
 path_refdata_rel <- "refdata"
+design3 <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
+                                     p0 = 0.2, backend = "exact")
 design4 <- baskwrap::setup_fujikawa_x(k = 4, shape1 = 1, shape2 = 1,
                                       p0 = 0.1, backend = "exact")
 logbase <- 3

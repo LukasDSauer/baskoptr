@@ -48,37 +48,36 @@ get_scenarios <- function(k, p0, p1, by = 1){
 #' @inheritParams u_ewp
 #' @param which_details_list  A list of two lists, `which_details_list[["p1"]]`
 #' and `which_details_list[["p2"]]`, containing the details which are to
-#' be requested for `p1` and `p2`, respectively.
+#' be requested for `p1` and `p2`, respectively. `NULL` means that all will be
+#' requested.
 #' @return A list of two lists containing return values of `get_details` calls.
 get_details_for_two_scenarios <- function(design, x, detail_params, p1, p2,
-                                          which_details_list){
+                                          which_details_list = NULL){
   detail_params <- io_val_p1(detail_params, p1)
-  if(!which_details_list == "all"){
-    # The following line is currently not in use
-    # nocov start
-    detail_params <- append_details(detail_params, "which_details",
+  if(!is.null(which_details_list)){
+    detail_params1 <- append_details(detail_params, "which_details",
                                     further = which_details_list[["p1"]])
-    # nocov end
+  } else {
+    detail_params1 <- set_details(detail_params, "which_details", "all")
   }
   details_p1 <- do.call(baskwrap::get_details,
                         c(design = list(design),
                           as.list(x),
-                          detail_params
+                          detail_params1
                         ))
 
   # Calculate details under p2
   detail_params$p1 <- p2
-  if(!which_details_list == "all"){
-    # The following line is currently not in use
-    # nocov start
-    detail_params <- append_details(detail_params, "which_details",
-                                    further = which_details_list[["p2"]])
-    # nocov end
+  if(!is.null(which_details_list)){
+    detail_params2 <- append_details(detail_params, "which_details",
+                                     further = which_details_list[["p2"]])
+  } else {
+    detail_params2 <- set_details(detail_params, "which_details", "all")
   }
   details_p2 <- do.call(baskwrap::get_details,
                         c(design = list(design),
                           as.list(x),
-                          detail_params))
+                          detail_params2))
   return(list(p1 = details_p1,
               p2 = details_p2))
 }
