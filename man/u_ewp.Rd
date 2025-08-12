@@ -102,7 +102,7 @@ u_ecd(design_x,
       x = list(lambda = 0.99, epsilon = 2, tau = 0.5),
       detail_params = list(p1 = c(0.5, 0.2, 0.2),
                            n = 20,
-                           weight_fun = baskexact::weights_fujikawa,
+                           weight_fun = baskwrap::weights_jsd,
                            logbase = exp(1)),
       penalty = 1, threshold = 0.1)
 }

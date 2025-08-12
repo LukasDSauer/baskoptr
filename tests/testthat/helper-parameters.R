@@ -6,7 +6,7 @@ design4 <- baskwrap::setup_fujikawa_x(k = 4, shape1 = 1, shape2 = 1,
                                       p0 = 0.1, backend = "exact")
 logbase <- 3
 detail_params_fuj <- list(n = 15,
-                          weight_fun = baskexact::weights_fujikawa,
+                          weight_fun = baskwrap::weights_jsd,
                           logbase = logbase,
                           verbose = FALSE)
 epsilon <- 1.5

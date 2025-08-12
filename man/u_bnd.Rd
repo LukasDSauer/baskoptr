@@ -54,7 +54,7 @@ upper <- list(lambda = 1, epsilon = 10, tau = 1)
 utility_params <- list(penalty = 1, threshold = 0.1)
 detail_params <- list(p1 = c(0.5, 0.2, 0.2),
                       n = 20,
-                      weight_fun = baskexact::weights_fujikawa,
+                      weight_fun = baskwrap::weights_jsd,
                       logbase = exp(1))
 # Out of bounds
 u_bnd(design = design,

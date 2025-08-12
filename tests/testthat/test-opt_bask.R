@@ -325,10 +325,10 @@ test_that("simulated annealing can retrieve parameter names, trace recorded by
   } else {
     expect_equal(-details_p0$FWER*penalty, res$value)
   }
-  expect_equal(attr(res, "final_details")$p2$Rejection_Probabilities,
-               details_p0$Rejection_Probabilities)
-  expect_equal(attr(res, "final_details")$p1$Rejection_Probabilities,
-               details_p1$Rejection_Probabilities)
+  expect_equal(attr(res, "final_details")$p2$FWER,
+               details_p0$FWER)
+  expect_equal(attr(res, "final_details")$p1$EWP,
+               details_p1$EWP)
   expect_equal(nrow(res$trace), 12)
   expect_equal(nrow(res$trace_alg), 10)
   expect_true(all(res$value >= res$trace$fn))

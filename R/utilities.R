@@ -59,7 +59,7 @@
 #'       x = list(lambda = 0.99, epsilon = 2, tau = 0.5),
 #'       detail_params = list(p1 = c(0.5, 0.2, 0.2),
 #'                            n = 20,
-#'                            weight_fun = baskexact::weights_fujikawa,
+#'                            weight_fun = baskwrap::weights_jsd,
 #'                            logbase = exp(1)),
 #'       penalty = 1, threshold = 0.1)
 u_ewp <- function(design, x, detail_params, p1 = NULL,
@@ -211,7 +211,7 @@ u_ecd <- function(design, x, detail_params, p1 = NULL,
 #'        x = list(lambda = 0.99, epsilon = 2, tau = 0.5),
 #'        detail_params = list(p1 = c(0.5, 0.2, 0.2),
 #'                             n = 20,
-#'                             weight_fun = baskexact::weights_fujikawa,
+#'                             weight_fun = baskwrap::weights_jsd,
 #'                             logbase = exp(1)),
 #'        penalty1 = 1, penalty2 = 2,
 #'        threshold = 0.1)
@@ -219,7 +219,7 @@ u_ecd <- function(design, x, detail_params, p1 = NULL,
 #'        x = list(lambda = 0.99, epsilon = 2, tau = 0.5),
 #'        detail_params = list(p1 = c(0.5, 0.2, 0.2),
 #'                             n = 20,
-#'                             weight_fun = baskexact::weights_fujikawa,
+#'                             weight_fun = baskwrap::weights_jsd,
 #'                             logbase = exp(1)),
 #'        penalty1 = 1, penalty2 = 2,
 #'        threshold = 0.1)
@@ -304,7 +304,7 @@ u_2pow <- function(design, x, detail_params, p1 = NULL,
 #'                                      p0 = 0.2, backend = "exact")
 #' x <- list(lambda = 0.99, epsilon = 2, tau = 0.5)
 #' detail_params <- list(n = 20,
-#'                       weight_fun = baskexact::weights_fujikawa,
+#'                       weight_fun = baskwrap::weights_jsd,
 #'                       logbase = exp(1))
 #' p1s <- rbind(c(0.2,0.2,0.2), c(0.2,0.2,0.5), c(0.2,0.5,0.5), c(0.5,0.5,0.5))
 #' # Averaging over u_ewp()
@@ -432,7 +432,7 @@ u_avg <- function(design, x, detail_params, utility, utility_params,
 #' utility_params <- list(penalty = 1, threshold = 0.1)
 #' detail_params <- list(p1 = c(0.5, 0.2, 0.2),
 #'                       n = 20,
-#'                       weight_fun = baskexact::weights_fujikawa,
+#'                       weight_fun = baskwrap::weights_jsd,
 #'                       logbase = exp(1))
 #' # Out of bounds
 #' u_bnd(design = design,

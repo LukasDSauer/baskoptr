@@ -10,7 +10,7 @@ get_details_for_two_scenarios(
   detail_params,
   p1,
   p2,
-  which_details_list
+  which_details_list = NULL
 )
 }
 \arguments{
@@ -32,7 +32,8 @@ global null scenario.}
 
 \item{which_details_list}{A list of two lists, \code{which_details_list[["p1"]]}
 and \code{which_details_list[["p2"]]}, containing the details which are to
-be requested for \code{p1} and \code{p2}, respectively.}
+be requested for \code{p1} and \code{p2}, respectively. \code{NULL} means that all will be
+requested.}
 }
 \value{
 A list of two lists containing return values of \code{get_details} calls.
