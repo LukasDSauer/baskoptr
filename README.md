@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# baskoptr
+# baskoptr <img src="man/figures/logo.png" align="right" height="139" />
 
 <!-- badges: start -->
 
@@ -39,7 +39,7 @@ design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
                                      p0 = 0.2, backend = "exact")
 detail_params <- list(p1 = c(0.5, 0.2, 0.2),
                       n = 20,
-                      weight_fun = weights_jsd,
+                      weight_fun = baskwrap::weights_jsd,
                       logbase = exp(1),
                       verbose = FALSE)
 utility_params <- list(penalty = 1, thresh = 0.1)
