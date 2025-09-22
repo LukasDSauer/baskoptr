@@ -10,10 +10,10 @@ Authors@R:
            comment = c(ORCID = "0000-0002-1340-9994"))
 License: MIT + file LICENSE
 Imports:
-    baskwrap (>= 1.0.0.9000),
+    baskwrap (>= 1.0.1),
     future.apply
 Suggests:
-    optimizr (>= 0.1.0),
+    optimizr (>= 1.0.0),
     baskexact,
     testthat (>= 3.0.0),
     progressr,
