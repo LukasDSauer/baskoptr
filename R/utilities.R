@@ -315,6 +315,7 @@ u_2pow <- function(design, x, detail_params, p1 = NULL,
 #'       utility_params = list(penalty = 1, threshold = 0.1),
 #'       p1s = p1s
 #'       )
+#' \donttest{
 #' # Averaging over u_2ewp()
 #' utility_params_2ewp <- list(penalty1 = 1, penalty2 = 2, threshold = 0.1)
 #' u_avg(design,
@@ -333,6 +334,7 @@ u_2pow <- function(design, x, detail_params, p1 = NULL,
 #'       p1s = p1s,
 #'       penalty_maxtoer = 1, threshold_maxtoer = 0.1
 #'       )
+#' }
 u_avg <- function(design, x, detail_params, utility, utility_params,
                   p1s, weights_u = rep(1/nrow(p1s), nrow(p1s)),
                   report_details = FALSE,
