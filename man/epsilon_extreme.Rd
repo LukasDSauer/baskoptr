@@ -27,6 +27,10 @@ design.}
 A numeric, the extreme borrowing cutoff for \eqn{\varepsilon}.
 }
 \description{
+Calculate the extreme borrowing cutoffs for the tuning parameters \eqn{\tau}
+and \eqn{\epsilon} in Fujikawa's basket trial design.
+}
+\details{
 The weights for the borrowing posterior in Fujikawa's design are calculated
 as
 \deqn{\omega_{ij} = \mathbf{1}(\tilde\omega_{ij}^\varepsilon>\tau)\cdot\tilde\omega_{ij}^\varepsilon}
@@ -46,10 +50,9 @@ We call this boundary the \emph{extreme borrowing cutoff}. The functions
 \deqn{  \tau \geq (\max_{r_k\neq r_l}\tilde\omega_{kl})^\varepsilon }
 and
 \deqn{   \varepsilon \geq \log_{\max_{r_k\neq r_l}\tilde\omega_{kl}}(\tau).}
-}
-\details{
 The extreme borrowing cutoffs depend neither on \code{p0} nor on \code{p1}. They only
-depend on the number of baskets \code{k} and the number of patients per basket \code{n}.
+depend on the number of baskets \code{k} and the number of patients per basket
+\code{n}. The extreme borrowing cutoff is discussed in Sauer et al. (2025).
 }
 \examples{
 design <- basksim::setup_fujikawa(k = 3,
@@ -60,4 +63,9 @@ detail_params <- list(n = 20,
                       logbase = exp(1))
 epsilon_extreme(design, tau = 0.5, detail_params)
 tau_extreme(design, epsilon = 2, detail_params)
+}
+\references{
+Sauer LD, Ritz A, Kieser M. Utility-based optimization of
+Fujikawa’s basket trial design – Pre-specified protocol of a comparison
+study. PLOS ONE. 2025;20(5):e0323097. \doi{doi:10.1371/journal.pone.0323097}
 }

@@ -65,6 +65,8 @@ For a utility function \eqn{u(\cdot, \mathbf p)} and a set of true scenarios
 \deqn{ \bar u(x) = \sum_i w_i u(x, \mathbf p_i)}
 for a set of weights with \eqn{\sum_i w_i=1}. By default,
 \eqn{w_i=\frac{1}{|\{\mathbf p_i,\ldots\}|}} for all \eqn{i}.
+The idea of averaging utility functions across a set of scenarios is taken
+from Jiang et al. (2021).
 }
 \examples{
 design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
@@ -102,4 +104,10 @@ u_avg(design,
       penalty_maxtoer = 1, threshold_maxtoer = 0.1
       )
 }
+}
+\references{
+Jiang L, Nie L, Yan F, Yuan Y. Optimal Bayesian hierarchical
+model to accelerate the development of tissue-agnostic drugs and basket
+trials. Contemporary Clinical Trials. 2021;107:106460.
+\doi{doi:10.1016/j.cct.2021.106460}
 }

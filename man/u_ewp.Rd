@@ -83,7 +83,9 @@ if \eqn{\mathrm{fwer}(x,\mathbf{p_2}) \geq \eta_1}. The parameter
 the penalty.
 
 The utility function \code{u_ecd} is defined analogously with the expected number
-of correct decisions instead of the experiment-wise power.
+of correct decisions (ECD) instead of the experiment-wise power. The use of
+ECD together with FWER constraints in the context of basket trials stems
+from Broglio et al. (2020).
 }
 \examples{
 # Calculating the EWP utility using basksim as a backend
@@ -105,4 +107,10 @@ u_ecd(design_x,
                            weight_fun = baskwrap::weights_jsd,
                            logbase = exp(1)),
       penalty = 1, threshold = 0.1)
+}
+\references{
+Broglio KR, Zhang F, Yu B, et al. A Comparison of Different
+Approaches to Bayesian Hierarchical Models in a Basket Trial to Evaluate the
+Benefits of Increasing Complexity. Statistics in Biopharmaceutical Research.
+2022;14(3):324-333. \doi{doi:10.1080/19466315.2021.2008484}
 }

@@ -70,7 +70,10 @@ The utility function \eqn{u_{\text{2pow}}} is defined analogously as
 \phi,\mathbf{p}) - \sum_{j\in R^c}\left(\xi_1\mathrm{toer}_j(\boldsymbol\phi,\mathbf{p}) +
 \xi_2(\mathrm{toer}_j(\boldsymbol\phi,\mathbf{p}) - \eta)\mathbf 1(
 \mathrm{toer}_j(\boldsymbol\phi,\mathbf{p}) - \eta) \right),}
-where \eqn{R} and \eqn{R^c} are the sets of active and inactive strata, respectively.
+where \eqn{R} and \eqn{R^c} are the sets of active and inactive strata,
+respectively.
+
+The (averaged) \eqn{u_{\text{2pow}}} is defined in Jiang et al. (2021).
 }
 \examples{
 design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
@@ -91,4 +94,10 @@ u_2pow(design,
                             logbase = exp(1)),
        penalty1 = 1, penalty2 = 2,
        threshold = 0.1)
+}
+\references{
+Jiang L, Nie L, Yan F, Yuan Y. Optimal Bayesian hierarchical
+model to accelerate the development of tissue-agnostic drugs and basket
+trials. Contemporary Clinical Trials. 2021;107:106460.
+\doi{doi:10.1016/j.cct.2021.106460}
 }

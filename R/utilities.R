@@ -18,7 +18,9 @@
 #' the penalty.
 #'
 #' The utility function `u_ecd` is defined analogously with the expected number
-#' of correct decisions instead of the experiment-wise power.
+#' of correct decisions (ECD) instead of the experiment-wise power. The use of
+#' ECD together with FWER constraints in the context of basket trials stems
+#' from Broglio et al. (2020).
 #'
 #' @inheritParams params_main
 #' @param x  A named list, the design's tuning parameters to be optimized.
@@ -40,6 +42,12 @@
 #' Default is `TRUE` for the `"exact"` backend and `FALSE` otherwise.
 #'
 #' @return A numeric, the parameter combination's utility.
+#'
+#' @references Broglio KR, Zhang F, Yu B, et al. A Comparison of Different
+#' Approaches to Bayesian Hierarchical Models in a Basket Trial to Evaluate the
+#' Benefits of Increasing Complexity. Statistics in Biopharmaceutical Research.
+#' 2022;14(3):324-333. \doi{doi:10.1080/19466315.2021.2008484}
+#'
 #' @export
 #'
 #' @examples
@@ -191,7 +199,10 @@ u_ecd <- function(design, x, detail_params, p1 = NULL,
 #' \phi,\mathbf{p}) - \sum_{j\in R^c}\left(\xi_1\mathrm{toer}_j(\boldsymbol\phi,\mathbf{p}) +
 #' \xi_2(\mathrm{toer}_j(\boldsymbol\phi,\mathbf{p}) - \eta)\mathbf 1(
 #' \mathrm{toer}_j(\boldsymbol\phi,\mathbf{p}) - \eta) \right),}
-#' where \eqn{R} and \eqn{R^c} are the sets of active and inactive strata, respectively.
+#' where \eqn{R} and \eqn{R^c} are the sets of active and inactive strata,
+#' respectively.
+#'
+#' The (averaged) \eqn{u_{\text{2pow}}} is defined in Jiang et al. (2021).
 #'
 #' @inheritParams params_main
 #' @param p1 A numeric, response scenario for calculating power and error rate.
@@ -203,6 +214,12 @@ u_ecd <- function(design, x, detail_params, p1 = NULL,
 #'
 #' @inherit u_ewp return
 #' @export
+#'
+#' @references Jiang L, Nie L, Yan F, Yuan Y. Optimal Bayesian hierarchical
+#' model to accelerate the development of tissue-agnostic drugs and basket
+#' trials. Contemporary Clinical Trials. 2021;107:106460.
+#' \doi{doi:10.1016/j.cct.2021.106460}
+#'
 #'
 #' @examples
 #' design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,
@@ -276,6 +293,8 @@ u_2pow <- function(design, x, detail_params, p1 = NULL,
 #' \deqn{ \bar u(x) = \sum_i w_i u(x, \mathbf p_i)}
 #' for a set of weights with \eqn{\sum_i w_i=1}. By default,
 #' \eqn{w_i=\frac{1}{|\{\mathbf p_i,\ldots\}|}} for all \eqn{i}.
+#' The idea of averaging utility functions across a set of scenarios is taken
+#' from Jiang et al. (2021).
 #'
 #' @inheritParams params_main
 #' @param detail_params A named list of parameters that need to be supplied to
@@ -298,6 +317,12 @@ u_2pow <- function(design, x, detail_params, p1 = NULL,
 #'
 #' @inherit u_ewp return
 #' @export
+#'
+#'
+#' @references Jiang L, Nie L, Yan F, Yuan Y. Optimal Bayesian hierarchical
+#' model to accelerate the development of tissue-agnostic drugs and basket
+#' trials. Contemporary Clinical Trials. 2021;107:106460.
+#' \doi{doi:10.1016/j.cct.2021.106460}
 #'
 #' @examples
 #' design <- baskwrap::setup_fujikawa_x(k = 3, shape1 = 1, shape2 = 1,

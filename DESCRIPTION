@@ -1,10 +1,11 @@
 Package: baskoptr
 Title: Utility-based Optimization for Basket Trial Designs
-Version: 1.0.3
-Description: The goal of baskoptr is to supply a unified framework for optimizing
+Version: 1.0.4
+Description: A unified framework for optimizing
     basket trial designs. To this end, the package supplies several utility
     functions and also a function for executing optimization algorithms on basket
-    trial designs.
+    trial designs. The considered utility functions are discussed in
+    Sauer et al. (2025) <doi:10.1371/journal.pone.0323097>.
 Authors@R: 
     person("Lukas D.", "Sauer", , "lukasdsauer@posteo.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1340-9994"))

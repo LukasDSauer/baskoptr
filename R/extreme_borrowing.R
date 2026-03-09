@@ -1,5 +1,8 @@
 #' Extreme borrowing cutoffs for borrowing in Fujikawa's design
 #'
+#' Calculate the extreme borrowing cutoffs for the tuning parameters \eqn{\tau}
+#' and \eqn{\epsilon} in Fujikawa's basket trial design.
+#'
 #' The weights for the borrowing posterior in Fujikawa's design are calculated
 #' as
 #' \deqn{\omega_{ij} = \mathbf{1}(\tilde\omega_{ij}^\varepsilon>\tau)\cdot\tilde\omega_{ij}^\varepsilon}
@@ -19,9 +22,9 @@
 #' \deqn{  \tau \geq (\max_{r_k\neq r_l}\tilde\omega_{kl})^\varepsilon }
 #' and
 #' \deqn{   \varepsilon \geq \log_{\max_{r_k\neq r_l}\tilde\omega_{kl}}(\tau).}
-#'
 #' The extreme borrowing cutoffs depend neither on `p0` nor on `p1`. They only
-#' depend on the number of baskets `k` and the number of patients per basket `n`.
+#' depend on the number of baskets `k` and the number of patients per basket
+#' `n`. The extreme borrowing cutoff is discussed in Sauer et al. (2025).
 #'
 #' @inheritParams params_main
 #' @param epsilon The optimization parameter \eqn{\varepsilon} of Fujikawa's basket trial
@@ -34,6 +37,11 @@
 #'
 #' @return A numeric, the extreme borrowing cutoff for \eqn{\varepsilon}.
 #' @export
+#'
+#' @references Sauer LD, Ritz A, Kieser M. Utility-based optimization of
+#' Fujikawa’s basket trial design – Pre-specified protocol of a comparison
+#' study. PLOS ONE. 2025;20(5):e0323097. \doi{doi:10.1371/journal.pone.0323097}
+#'
 #'
 #' @examples
 #' design <- basksim::setup_fujikawa(k = 3,
