@@ -7,22 +7,22 @@ Description: A unified framework for optimizing
     trial designs. The considered utility functions are discussed in
     Sauer et al. (2025) <doi:10.1371/journal.pone.0323097>.
 Authors@R: 
-    person("Lukas D.", "Sauer", , "lukasdsauer@posteo.de", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-1340-9994"))
+    person("Lukas D", "Sauer", , "sauer@imbi.uni-heidelberg.de", 
+           role = c("aut", "cre"),
+           comment = c(ORCID = "https://orcid.org/0000-0002-1340-9994"))
 License: MIT + file LICENSE
 Imports:
     baskwrap (>= 1.0.1),
     future.apply
 Suggests:
     optimizr (>= 1.0.0),
-    baskexact,
+    baskexact (>= 1.0.0),
     testthat (>= 3.0.0),
     progressr,
-    basksim
+    basksim (>= 2.0.0)
+URL: https://github.com/LukasDSauer/baskoptr
+BugReports: https://github.com/LukasDSauer/baskoptr/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Config/testthat/edition: 3
-Remotes: 
-    LukasDSauer/baskwrap,
-    LukasDSauer/optimizr
